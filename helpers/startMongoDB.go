@@ -41,5 +41,14 @@ func StartMongoDB() *mongo.Database {
 		panic("MONGODB_DBNAME is not set")
 	}
 
-	return client.Database(MONGODB_DBNAME)
+	database := client.Database(MONGODB_DBNAME)
+
+	if database == nil {
+		log.Fatalln("Database is not found")
+		panic("Database is not found")
+	}
+
+	fmt.Println("MongoDB is connected")
+
+	return database
 }
