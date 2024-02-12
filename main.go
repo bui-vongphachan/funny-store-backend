@@ -26,5 +26,12 @@ func main() {
 
 	r := routes.SetupRouter(db)
 
-	r.Run()
+	PORT := os.Getenv("PORT")
+	if PORT == "" {
+		PORT = "8080"
+	}
+
+	log.Print("Server is running on port " + PORT + "...")
+
+	r.Run(":" + PORT)
 }
