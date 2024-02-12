@@ -20,7 +20,7 @@ func StartMongoDB() *mongo.Database {
 		log.Println("No .env file found")
 	}
 
-	MONGO_URI := os.Getenv("MONGO_URI")
+	MONGO_URI := os.Getenv("MONGODB_URI")
 
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(MONGO_URI))
 
