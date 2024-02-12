@@ -14,7 +14,7 @@ import (
 
 func StartMongoDB() *mongo.Database {
 
-	fmt.Println("Hello, World!")
+	fmt.Println("Starting MongoDB...")
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -34,5 +34,12 @@ func StartMongoDB() *mongo.Database {
 		panic(err)
 	}
 
-	return client.Database("testing")
+	MONGODB_DBNAME := os.Getenv("MONGODB_DBNAME")
+
+	if MONGODB_DBNAME == "" {
+		log.Fatalln("MONGODB_DBNAME is not set")
+		panic("MONGODB_DBNAME is not set")
+	}
+
+	return client.Database(MONGODB_DBNAME)
 }
