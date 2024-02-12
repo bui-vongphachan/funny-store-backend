@@ -12,6 +12,7 @@ import (
 
 func main() {
 	db := helpers.StartMongoDB()
+
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
 	}
