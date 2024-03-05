@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	product_variation_swap "github.com/vongphachan/funny-store-backend/routes/products/variations/swap"
+	product_draft "github.com/vongphachan/funny-store-backend/routes/products/draft"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -16,7 +16,7 @@ func SetupRouter(db *mongo.Database) *gin.Engine {
 
 	router.SetTrustedProxies([]string{CURRENT_PROXY})
 
-	product_variation_swap.SwapProductVariation(db, router)
+	product_draft.Create(db, router)
 
 	return router
 }
