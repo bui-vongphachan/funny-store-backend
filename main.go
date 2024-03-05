@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/vongphachan/funny-store-backend/helpers"
-	"github.com/vongphachan/funny-store-backend/routes"
+	"github.com/vongphachan/funny-store-backend/src/routes"
 )
 
 func main() {
