@@ -1,4 +1,4 @@
-package serviceproductdraft
+package serviceproduct
 
 import (
 	model "github.com/vongphachan/funny-store-backend/src/models"
