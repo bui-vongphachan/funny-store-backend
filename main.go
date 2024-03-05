@@ -6,12 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/vongphachan/funny-store-backend/helpers"
+	initiatesmongodb "github.com/vongphachan/funny-store-backend/src/initiators/mongodb"
 	"github.com/vongphachan/funny-store-backend/src/routes"
 )
 
 func main() {
-	db := helpers.StartMongoDB()
+	db := initiatesmongodb.Start()
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
