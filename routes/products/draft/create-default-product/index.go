@@ -1,12 +1,12 @@
 package createdefaultproduct
 
 import (
-	typeproduct "github.com/vongphachan/funny-store-backend/types"
+	model "github.com/vongphachan/funny-store-backend/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func Main() typeproduct.Product {
-	output := typeproduct.Product{
+func Main() model.Product {
+	output := model.Product{
 		ID:                  primitive.NewObjectID().Hex(),
 		Title:               "",
 		Description:         "",
