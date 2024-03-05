@@ -1,4 +1,4 @@
-package typeproduct
+package model
 
 type Product struct {
 	ID                  string   `json:"_id"`
