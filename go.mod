@@ -8,6 +8,8 @@ require (
 )
 
 require (
+	github.com/bxcodec/faker/v3 v3.8.1 // indirect
+	github.com/bxcodec/faker/v4 v4.0.0-beta.3 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
