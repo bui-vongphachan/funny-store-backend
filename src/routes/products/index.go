@@ -1,10 +1,13 @@
 package routeproduct
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	serviceproduct "github.com/vongphachan/funny-store-backend/src/services/product"
+	serviceproductattribute "github.com/vongphachan/funny-store-backend/src/services/product-attribute"
+	serviceproductattributegroup "github.com/vongphachan/funny-store-backend/src/services/product-attribute-group"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -18,6 +21,15 @@ func CreateDraft(db *mongo.Database, r *gin.Engine) {
 		}
 
 		product := serviceproduct.CreateEmpty()
+
+		attributeGroup := serviceproductattributegroup.CreateEmpty(&product.ID)
+
+		attribute := serviceproductattribute.CreateEmpty(&serviceproductattribute.CreateEmptyProps{
+			Product:        product,
+			AttributeGroup: attributeGroup,
+		})
+
+		log.Println(attribute)
 
 		result["data"] = product
 
