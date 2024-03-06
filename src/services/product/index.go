@@ -5,9 +5,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func CreateEmpty() model.Product {
+func CreateEmpty() *model.Product {
 	output := model.Product{
-		ID:                  primitive.NewObjectID().Hex(),
+		ID:                  primitive.NewObjectID(),
 		Title:               "",
 		Description:         "",
 		PreviewImages:       []string{},
@@ -18,5 +18,5 @@ func CreateEmpty() model.Product {
 		IsDraft:             true,
 	}
 
-	return output
+	return &output
 }
