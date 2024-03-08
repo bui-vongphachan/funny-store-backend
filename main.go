@@ -34,5 +34,5 @@ func main() {
 
 	log.Print("Server is running on port " + PORT + "...")
 
-	r.Run(":" + PORT)
+	r.Run("localhost:" + PORT)
 }
