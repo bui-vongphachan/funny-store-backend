@@ -62,9 +62,10 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 		pipelines := mongo.Pipeline{}
 
 		matchStage := MakeMatchPaginationPipeline(c.Request.URL.Query())
+		log.Println("matchStage", matchStage)
 
 		if matchStage != nil {
-			pipelines = append(pipelines, *matchStage)
+			pipelines = append(pipelines, bson.D{{Key: "$match", Value: *matchStage}})
 		}
 
 		skipStage := utils.MakeSkipStage(c.Request.URL.Query())
@@ -72,6 +73,8 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 
 		limitStage := utils.MakeLimitStage(c.Request.URL.Query())
 		pipelines = append(pipelines, *limitStage)
+
+		log.Println("pipelines", pipelines)
 
 		cursor, err := db.Collection(CollectionName).Aggregate(context.TODO(), pipelines)
 		if err != nil {
@@ -94,14 +97,10 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 			return
 		}
 
-		log.Println("totalItems", *totalItems)
-
 		output := gin.H{
 			"totalItems": totalItems,
 			"items":      items,
 		}
-
-		log.Println("output", output)
 
 		result["status"] = http.StatusOK
 		result["isError"] = false
