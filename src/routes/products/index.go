@@ -23,10 +23,7 @@ func CreateDraft(db *mongo.Database, r *gin.Engine) {
 
 		attributeGroup := serviceproductattributegroup.CreateEmpty(&product.ID)
 
-		attribute := serviceproductattribute.CreateEmpty(&serviceproductattribute.CreateEmptyProps{
-			Product:        product,
-			AttributeGroup: attributeGroup,
-		})
+		attribute := serviceproductattribute.CreateEmpty(&product.ID, &attributeGroup.ID)
 
 		serviceproduct.Save(db, product)
 

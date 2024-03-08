@@ -16,14 +16,14 @@ type CreateEmptyProps struct {
 	AttributeGroup *modelproduct.AttributeGroup
 }
 
-func CreateEmpty(props *CreateEmptyProps) *modelproduct.Attribute {
+func CreateEmpty(productId *primitive.ObjectID, attributeGroupId *primitive.ObjectID) *modelproduct.Attribute {
 
 	output := modelproduct.Attribute{
 		ID:               primitive.NewObjectID(),
 		Title:            "",
 		Image:            "",
-		ProductID:        props.Product.ID,
-		AttributeGroupID: props.AttributeGroup.ID,
+		ProductID:        *productId,
+		AttributeGroupID: *attributeGroupId,
 	}
 
 	return &output
