@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -24,14 +25,20 @@ func CreateEmpty() *Product {
 	return &output
 }
 
-func Save(db *mongo.Database, product *Product) *Product {
+func Save(db *mongo.Database, product *Product) (*Product, error) {
 
-	_, err := db.Collection(CollectionName).InsertOne(context.TODO(), product)
+	result, err := db.Collection(CollectionName).InsertOne(context.TODO(), product)
 
 	if err != nil {
 		log.Fatalln(err.Error())
-		return nil
+		return nil, err
 	}
 
-	return product
+	if result.InsertedID == nil {
+		err := errors.New("inserted id is nil")
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return product, nil
 }

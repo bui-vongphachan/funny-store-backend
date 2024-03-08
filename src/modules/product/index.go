@@ -34,7 +34,12 @@ func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
 			return
 		}
 
-		Save(db, product)
+		saveResult, err := Save(db, product)
+		if err != nil || saveResult == nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusOK, result)
+			return
+		}
 
 		product_attribute_group.Save(db, attributeGroup)
 
