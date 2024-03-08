@@ -46,6 +46,9 @@ func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
 		product_attribute.Save(db, attribute)
 
 		result["data"] = product
+		result["status"] = http.StatusCreated
+		result["isError"] = false
+		result["message"] = "ສໍາເລັດ"
 
 		c.JSON(http.StatusOK, result)
 	})
