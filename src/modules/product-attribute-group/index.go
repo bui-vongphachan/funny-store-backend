@@ -2,7 +2,6 @@ package product_attribute_group
 
 import (
 	"context"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -62,7 +61,6 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 		pipelines := mongo.Pipeline{}
 
 		matchStage := MakeMatchPaginationPipeline(c.Request.URL.Query())
-		log.Println("matchStage", matchStage)
 
 		if matchStage != nil {
 			pipelines = append(pipelines, bson.D{{Key: "$match", Value: *matchStage}})
@@ -73,8 +71,6 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 
 		limitStage := utils.MakeLimitStage(c.Request.URL.Query())
 		pipelines = append(pipelines, *limitStage)
-
-		log.Println("pipelines", pipelines)
 
 		cursor, err := db.Collection(CollectionName).Aggregate(context.TODO(), pipelines)
 		if err != nil {
