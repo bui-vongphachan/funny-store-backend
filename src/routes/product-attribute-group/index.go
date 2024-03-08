@@ -1,14 +1,11 @@
 package routeproduct
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	collectionname "github.com/vongphachan/funny-store-backend/src/constraints/table-names"
 	modelproduct "github.com/vongphachan/funny-store-backend/src/models/products"
 	serviceproductattributegroup "github.com/vongphachan/funny-store-backend/src/services/product-attribute-group"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -59,13 +56,9 @@ func Update(db *mongo.Database, r *gin.Engine) {
 
 		attributeGroup := serviceproductattributegroup.FindById(db, &attributeGroupId)
 		if attributeGroup == nil {
-			result["data"] = nil
-			result["isError"] = true
 			result["status"] = 404
 			result["message"] = "Data not found"
-
 			c.JSON(http.StatusOK, result)
-
 			return
 		}
 
@@ -77,19 +70,24 @@ func Update(db *mongo.Database, r *gin.Engine) {
 			c.JSON(http.StatusOK, result)
 		}
 
-		id, err := primitive.ObjectIDFromHex(c.Param("id"))
+		newData, err := serviceproductattributegroup.BindNewData(nil, nil)
 		if err != nil {
-			result["message"] = err.Error()
+			result["status"] = 403
+			result["message"] = "Invalid data"
 			c.JSON(http.StatusOK, result)
+			return
 		}
 
-		filter := bson.M{"_id": id}
+		// update := bson.M{"$set": bson.M{"avg_rating": 4}}
 
-		update := bson.M{"$set": bson.M{"avg_rating": 4}}
+		// context := context.TODO()
 
-		context := context.TODO()
+		// db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).UpdateOne(context, filter, bson.M{"$set": update})
 
-		db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).UpdateOne(context, filter, bson.M{"$set": update})
+		result["status"] = 200
+		result["isError"] = false
+		result["message"] = "Updated"
+		result["data"] = newData
 
 		c.JSON(http.StatusOK, result)
 	})

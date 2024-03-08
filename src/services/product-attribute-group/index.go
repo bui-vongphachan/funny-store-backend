@@ -2,6 +2,7 @@ package serviceproductattributegroup
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	collectionname "github.com/vongphachan/funny-store-backend/src/constraints/table-names"
@@ -64,15 +65,23 @@ func FindById(db *mongo.Database, id *string) *modelproduct.AttributeGroup {
 	return &attributeGroup
 }
 
-// func ExcludeEmptyData(payload *modelproduct.AttributeGroup) *modelproduct.AttributeGroup {
-// 	data := make(map[string]interface{})
+func BindNewData(input *modelproduct.AttributeGroup, data *modelproduct.AttributeGroup) (*modelproduct.AttributeGroup, error) {
+	if input == nil {
+		return nil, errors.New("input is nil")
+	}
 
-// 	if payload.Title != "" {
-// 		data["Title"] = payload.Title
-// 	}
+	if data == nil {
+		return nil, errors.New("data is empty")
+	}
 
-// 	output := &modelproduct.AttributeGroup{}
-// }
+	if input.Title != "" {
+		data.Title = input.Title
+	}
+
+	data.Delete = input.Delete
+
+	return data, nil
+}
 
 // func Update(db *mongo.Database, id *string) {
 // 	filter := bson.M{"_id": id}
