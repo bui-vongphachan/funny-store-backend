@@ -2,8 +2,7 @@ package serviceproduct
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
+	"log"
 
 	collectionname "github.com/vongphachan/funny-store-backend/src/constraints/table-names"
 	model "github.com/vongphachan/funny-store-backend/src/models"
@@ -27,28 +26,16 @@ func CreateEmpty() *model.Product {
 	return &output
 }
 
-type SaveToDatabaseProps struct {
-	DB      *mongo.Database
-	Product *model.Product
-}
-
-func SaveToDatabase(props *SaveToDatabaseProps) *model.Product {
+func SaveToDatabase(db *mongo.Database, product *model.Product) *model.Product {
 
 	context := context.TODO()
 
-	cursur, err := props.DB.Collection(collectionname.PRODUCT).InsertOne(context, props.Product)
+	_, err := db.Collection(collectionname.PRODUCT).InsertOne(context, product)
 
 	if err != nil {
+		log.Fatalln(err.Error())
 		return nil
 	}
 
-	jsonData, err := json.MarshalIndent(cursur, "", "    ")
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("%s\n", jsonData)
-
-	return props.Product
+	return product
 }
