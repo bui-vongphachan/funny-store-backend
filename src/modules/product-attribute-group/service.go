@@ -49,8 +49,6 @@ func MakeMatchPaginationPipeline(query url.Values, pipeline *primitive.A) *primi
 
 func CreateEmpty(productId *string) (*AttributeGroup, error) {
 	productObjectId, err := primitive.ObjectIDFromHex(*productId)
-	log.Println("productObjectId")
-	log.Println(productObjectId)
 	if err != nil {
 		er := errors.New("invalid product id")
 		log.Println(er.Error())
@@ -68,27 +66,33 @@ func CreateEmpty(productId *string) (*AttributeGroup, error) {
 	return &output, nil
 }
 
-func Save(db *mongo.Database, attributeGroup *AttributeGroup) *AttributeGroup {
+func Save(db *mongo.Database, attributeGroup *AttributeGroup) (*AttributeGroup, error) {
 
 	context := context.TODO()
 
-	_, err := db.Collection(CollectionName).InsertOne(context, attributeGroup)
+	result, err := db.Collection(CollectionName).InsertOne(context, attributeGroup)
 
 	if err != nil {
 		log.Fatalln(err.Error())
-		return nil
+		return nil, err
 	}
 
-	return attributeGroup
+	if result.InsertedID == nil {
+		er := errors.New("inserted id is nil")
+		log.Println(er.Error())
+		return nil, er
+	}
+
+	return attributeGroup, nil
 }
 
-func FindById(db *mongo.Database, id *string) *AttributeGroup {
+func FindById(db *mongo.Database, id *string) (*AttributeGroup, error) {
 	context := context.TODO()
 
 	objectID, err := primitive.ObjectIDFromHex(*id)
 	if err != nil {
 		log.Fatalln(err.Error())
-		return nil
+		return nil, err
 	}
 
 	filter := bson.M{"_id": objectID}
@@ -96,17 +100,16 @@ func FindById(db *mongo.Database, id *string) *AttributeGroup {
 	result := db.Collection(CollectionName).FindOne(context, filter)
 	if result.Err() != nil {
 		log.Fatalln(result.Err().Error())
-		return nil
+		return nil, result.Err()
 	}
 
 	var attributeGroup AttributeGroup
-	err = result.Decode(&attributeGroup)
-	if err != nil {
+	if err := result.Decode(&attributeGroup); err != nil {
 		log.Fatalln(err.Error())
-		return nil
+		return nil, err
 	}
 
-	return &attributeGroup
+	return &attributeGroup, nil
 }
 
 func BindNewData(input *AttributeGroup, data *AttributeGroup) (*AttributeGroup, error) {

@@ -94,18 +94,16 @@ func API_Update(db *mongo.Database, r *gin.Engine) {
 
 		attributeGroupId := c.Param("id")
 
-		attributeGroup := FindById(db, &attributeGroupId)
-		if attributeGroup == nil {
+		attributeGroup, err := FindById(db, &attributeGroupId)
+		if err != nil || attributeGroup == nil {
 			result["status"] = 404
-			result["message"] = "Data not found"
+			result["message"] = err.Error()
 			c.JSON(http.StatusOK, result)
 			return
 		}
 
 		var requestBody AttributeGroup
-
-		err := c.Bind(&requestBody)
-		if err != nil {
+		if err := c.Bind(&requestBody); err != nil {
 			result["message"] = err.Error()
 			c.JSON(http.StatusOK, result)
 		}
