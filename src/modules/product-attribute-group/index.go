@@ -18,7 +18,7 @@ type CreateType struct {
 	ProductID primitive.ObjectID `json:"productId"`
 }
 
-func Create(db *mongo.Database, r *gin.Engine) {
+func API_Create(db *mongo.Database, r *gin.Engine) {
 	r.POST("/product/attribute-group", func(c *gin.Context) {
 		result := gin.H{
 			"status":  400,
@@ -47,7 +47,7 @@ func Create(db *mongo.Database, r *gin.Engine) {
 
 }
 
-func Pagination(db *mongo.Database, r *gin.Engine) {
+func API_Pagination(db *mongo.Database, r *gin.Engine) {
 	r.GET("/product/attribute-group", func(c *gin.Context) {
 		result := gin.H{
 			"status":  http.StatusBadRequest,
@@ -81,7 +81,7 @@ func Pagination(db *mongo.Database, r *gin.Engine) {
 	})
 }
 
-func Update(db *mongo.Database, r *gin.Engine) {
+func API_Update(db *mongo.Database, r *gin.Engine) {
 	r.PATCH("/product/attribute-group/:id", func(c *gin.Context) {
 		result := gin.H{
 			"status":  400,
