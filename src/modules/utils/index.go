@@ -5,10 +5,10 @@ import (
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func MakeSkipOffsetPipeLine(query *url.Values) *bson.D {
-	var pipeline bson.D
+func MakeSkipOffsetPipeLine(query *url.Values, pipeline *primitive.A) *primitive.A {
 
 	limit := 10
 	skip := 0
@@ -24,7 +24,9 @@ func MakeSkipOffsetPipeLine(query *url.Values) *bson.D {
 			limit = 100
 		}
 
-		pipeline = append(pipeline, bson.E{Key: "$limit", Value: limit})
+		newPipeline := bson.D{{Key: "$limit", Value: limit}}
+
+		*pipeline = append(*pipeline, newPipeline)
 	}
 
 	if query.Has(jsonSkip) {
@@ -35,11 +37,10 @@ func MakeSkipOffsetPipeLine(query *url.Values) *bson.D {
 			skip = 0
 		}
 
-		pipeline = append(pipeline, bson.E{Key: "$skip", Value: skip})
+		newPipeline := bson.D{{Key: "$skip", Value: skip}}
 
+		*pipeline = append(*pipeline, newPipeline)
 	}
 
-	pipeline = append(pipeline, bson.E{Key: "$skip", Value: 0})
-
-	return &pipeline
+	return pipeline
 }
