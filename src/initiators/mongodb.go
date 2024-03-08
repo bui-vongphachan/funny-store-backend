@@ -1,4 +1,4 @@
-package initiatesmongodb
+package initiators
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func Start() *mongo.Database {
+func StartMongoDB() *mongo.Database {
 
 	fmt.Println("Starting MongoDB...")
 
