@@ -49,6 +49,8 @@ func MakeMatchPaginationPipeline(query url.Values, pipeline *primitive.A) *primi
 
 func CreateEmpty(productId *string) (*AttributeGroup, error) {
 	productObjectId, err := primitive.ObjectIDFromHex(*productId)
+	log.Println("productObjectId")
+	log.Println(productObjectId)
 	if err != nil {
 		er := errors.New("invalid product id")
 		log.Println(er.Error())
@@ -56,10 +58,10 @@ func CreateEmpty(productId *string) (*AttributeGroup, error) {
 	}
 
 	output := AttributeGroup{
-		ID:        primitive.NewObjectID().String(),
+		ID:        primitive.NewObjectID().Hex(),
 		Title:     "",
 		IsPrimary: true,
-		ProductID: productObjectId.String(),
+		ProductID: productObjectId.Hex(),
 		Delete:    false,
 	}
 

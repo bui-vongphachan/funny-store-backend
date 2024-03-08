@@ -10,7 +10,7 @@ import (
 
 func CreateEmpty() *Product {
 	output := Product{
-		ID:                  primitive.NewObjectID().String(),
+		ID:                  primitive.NewObjectID().Hex(),
 		Title:               "",
 		Description:         "",
 		PreviewImages:       []string{},

@@ -25,7 +25,7 @@ func CreateEmpty(productId *string, attributeGroupId *string) (*ProductAttribute
 	}
 
 	output := ProductAttribute{
-		ID:               primitive.NewObjectID().String(),
+		ID:               primitive.NewObjectID().Hex(),
 		Title:            "",
 		Image:            "",
 		ProductID:        productObjectId.String(),
