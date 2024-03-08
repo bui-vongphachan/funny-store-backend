@@ -58,26 +58,37 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 			"message": "ຂໍ້ມູນບໍ່ຖືກຕ້ອງ",
 		}
 
-		pipeline := bson.A{}
+		pipelines := mongo.Pipeline{}
 
-		pipeline = *MakeMatchPaginationPipeline(c.Request.URL.Query(), &pipeline)
+		if matchStage := MakeMatchPaginationPipeline(c.Request.URL.Query()); matchStage != nil {
+			pipelines = append(pipelines, *matchStage)
+		}
 
-		pipeline = *utils.MakeSkipOffsetPipeLine(c.Request.URL.Query(), &pipeline)
+		skipStage := utils.MakeSkipStage(c.Request.URL.Query())
+		pipelines = append(pipelines, *skipStage)
 
-		cursor, err := db.Collection(CollectionName).Aggregate(context.TODO(), pipeline)
+		limitStage := utils.MakeLimitStage(c.Request.URL.Query())
+		pipelines = append(pipelines, *limitStage)
+
+		cursor, err := db.Collection(CollectionName).Aggregate(context.TODO(), pipelines)
 		if err != nil {
 			result["message"] = err.Error()
 			c.JSON(http.StatusInternalServerError, result)
 			return
 		}
 
-		// Decode results
-		var results []AttributeGroup
-		if err := cursor.All(context.TODO(), &results); err != nil {
+		payload := []bson.M{}
+
+		if err := cursor.All(context.TODO(), &payload); err != nil {
 			result["message"] = err.Error()
 			c.JSON(http.StatusInternalServerError, result)
 			return
 		}
+
+		result["status"] = http.StatusOK
+		result["isError"] = false
+		result["data"] = payload
+		result["message"] = "ສໍາເລັດ"
 
 		c.JSON(http.StatusOK, result)
 	})
