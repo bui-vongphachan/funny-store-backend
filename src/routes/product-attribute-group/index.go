@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	modelproduct "github.com/vongphachan/funny-store-backend/src/models/products"
 	serviceproductattributegroup "github.com/vongphachan/funny-store-backend/src/services/product-attribute-group"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -78,11 +79,8 @@ func Update(db *mongo.Database, r *gin.Engine) {
 			return
 		}
 
-		// update := bson.M{"$set": bson.M{"avg_rating": 4}}
-
-		// context := context.TODO()
-
-		// db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).UpdateOne(context, filter, bson.M{"$set": update})
+		filter := bson.M{"_id": attributeGroup.ID}
+		serviceproductattributegroup.UpdateOne(db, &filter, newData)
 
 		result["status"] = 200
 		result["isError"] = false

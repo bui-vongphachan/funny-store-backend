@@ -87,11 +87,26 @@ func BindNewData(input *modelproduct.AttributeGroup, data *modelproduct.Attribut
 	return data, nil
 }
 
-// func Update(db *mongo.Database, id *string) {
-// 	filter := bson.M{"_id": id}
+func UpdateOne(db *mongo.Database, filter *bson.M, payload *modelproduct.AttributeGroup) (*modelproduct.AttributeGroup, error) {
 
-// 	context := context.TODO()
+	context := context.TODO()
 
-// 	db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).UpdateOne(context, filter, bson.M{"$set": update})
+	update := bson.M{"$set": payload}
 
-// }
+	result, err := db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).UpdateOne(context, filter, update)
+	if err != nil {
+		er := errors.New("unable to update attribute group")
+		log.Println(er.Error())
+		return nil, er
+	}
+
+	if result.MatchedCount == 0 {
+		log.Println("attribute group not matched")
+	}
+
+	if result.ModifiedCount == 0 {
+		log.Println("attribute group not updated")
+	}
+
+	return payload, nil
+}
