@@ -1,9 +1,11 @@
 package routeproductattributegroup
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	collectionname "github.com/vongphachan/funny-store-backend/src/constraints/table-names"
 	modelproduct "github.com/vongphachan/funny-store-backend/src/models/products"
 	serviceproductattributegroup "github.com/vongphachan/funny-store-backend/src/services/product-attribute-group"
 	"go.mongodb.org/mongo-driver/bson"
@@ -42,6 +44,29 @@ func Create(db *mongo.Database, r *gin.Engine) {
 		c.JSON(http.StatusOK, result)
 	})
 
+}
+
+func Pagination(db *mongo.Database, r *gin.Engine) {
+	r.GET("/product/attribute-group", func(c *gin.Context) {
+		result := gin.H{
+			"status":  400,
+			"isError": true,
+			"data":    nil,
+			"message": "ຂໍ້ມູນບໍ່ຖືກຕ້ອງ",
+		}
+
+		filter := MakeMatchPaginationPipeline(c.Request.URL.Query())
+
+		context := context.TODO()
+
+		pipeline := bson.A{}
+
+		pipeline = append(pipeline, filter)
+
+		db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).Aggregate(context, pipeline)
+
+		c.JSON(http.StatusOK, result)
+	})
 }
 
 func Update(db *mongo.Database, r *gin.Engine) {
