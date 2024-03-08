@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func MakeSkipOffsetPipeLine(query *url.Values, pipeline *primitive.A) *primitive.A {
+func MakeSkipOffsetPipeLine(query url.Values, pipeline *primitive.A) *primitive.A {
 
 	limit := 10
 	skip := 0

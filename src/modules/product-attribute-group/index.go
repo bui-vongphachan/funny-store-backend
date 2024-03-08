@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	collectionname "github.com/vongphachan/funny-store-backend/src/constraints/table-names"
 	modelproduct "github.com/vongphachan/funny-store-backend/src/models/products"
+	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	serviceproductattributegroup "github.com/vongphachan/funny-store-backend/src/services/product-attribute-group"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -58,6 +59,8 @@ func Pagination(db *mongo.Database, r *gin.Engine) {
 		pipeline := bson.A{}
 
 		pipeline = *MakeMatchPaginationPipeline(c.Request.URL.Query(), &pipeline)
+
+		pipeline = *utils.MakeSkipOffsetPipeLine(c.Request.URL.Query(), &pipeline)
 
 		cursor, err := db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).Aggregate(context.TODO(), pipeline)
 		if err != nil {
