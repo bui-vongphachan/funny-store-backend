@@ -70,7 +70,7 @@ func Update(db *mongo.Database, r *gin.Engine) {
 			c.JSON(http.StatusOK, result)
 		}
 
-		newData, err := serviceproductattributegroup.BindNewData(nil, nil)
+		newData, err := serviceproductattributegroup.BindNewData(&requestBody, attributeGroup)
 		if err != nil {
 			result["status"] = 403
 			result["message"] = "Invalid data"
