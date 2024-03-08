@@ -11,11 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func MakeMatchPaginationPipeline(query url.Values) *primitive.D {
+func MakeMatchPaginationPipeline(query url.Values) *bson.D {
 	var matchStage bson.D
-
-	log.Println("matchStage")
-	log.Println(matchStage)
 
 	objectID, err := primitive.ObjectIDFromHex(query.Get(jsonID))
 	if err == nil || query.Get(jsonID) != "" {
@@ -40,9 +37,9 @@ func MakeMatchPaginationPipeline(query url.Values) *primitive.D {
 			Value: "i",
 		}}
 
-		newDoc := bson.D{{Key: "title", Value: regexOptions}}
+		newDoc := bson.E{Key: "title", Value: regexOptions}
 
-		matchStage = append(matchStage, newDoc...)
+		matchStage = append(matchStage, newDoc)
 	}
 
 	if len(matchStage) == 0 {
@@ -161,4 +158,17 @@ func UpdateOne(db *mongo.Database, filter *bson.M, payload *AttributeGroup) (*At
 	}
 
 	return payload, nil
+}
+
+func CountDocs(db *mongo.Database, filter *bson.D) (*int64, error) {
+	filterOptions := bson.M{}
+	context := context.TODO()
+
+	cursor, err := db.Collection(CollectionName).CountDocuments(context, filterOptions)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return &cursor, err
 }

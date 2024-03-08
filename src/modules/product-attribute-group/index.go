@@ -2,6 +2,7 @@ package product_attribute_group
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -60,7 +61,9 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 
 		pipelines := mongo.Pipeline{}
 
-		if matchStage := MakeMatchPaginationPipeline(c.Request.URL.Query()); matchStage != nil {
+		matchStage := MakeMatchPaginationPipeline(c.Request.URL.Query())
+
+		if matchStage != nil {
 			pipelines = append(pipelines, *matchStage)
 		}
 
@@ -77,17 +80,32 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 			return
 		}
 
-		payload := []bson.M{}
-
-		if err := cursor.All(context.TODO(), &payload); err != nil {
+		items := []bson.M{}
+		if err := cursor.All(context.TODO(), &items); err != nil {
 			result["message"] = err.Error()
 			c.JSON(http.StatusInternalServerError, result)
 			return
 		}
 
+		totalItems, err := CountDocs(db, matchStage)
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusInternalServerError, result)
+			return
+		}
+
+		log.Println("totalItems", *totalItems)
+
+		output := gin.H{
+			"totalItems": totalItems,
+			"items":      items,
+		}
+
+		log.Println("output", output)
+
 		result["status"] = http.StatusOK
 		result["isError"] = false
-		result["data"] = payload
+		result["data"] = output
 		result["message"] = "ສໍາເລັດ"
 
 		c.JSON(http.StatusOK, result)
