@@ -6,7 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/vongphachan/funny-store-backend/src/modules/product"
 	product_attribute_group "github.com/vongphachan/funny-store-backend/src/modules/product-attribute-group"
+	product_attribute "github.com/vongphachan/funny-store-backend/src/modules/product-attributes"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -41,6 +43,10 @@ func setupRoutes(db *mongo.Database) *gin.Engine {
 	CURRENT_PROXY := os.Getenv("CURRENT_PROXY")
 
 	router.SetTrustedProxies([]string{CURRENT_PROXY})
+
+	product.API_CreateDraft(db, router)
+
+	product_attribute.API_Create(db, router)
 
 	product_attribute_group.API_Create(db, router)
 	product_attribute_group.API_Pagination(db, router)

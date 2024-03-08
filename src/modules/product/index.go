@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateDraft(db *mongo.Database, r *gin.Engine) {
+func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
 	r.POST("/product/draft", func(c *gin.Context) {
 		result := gin.H{
 			"status":  http.StatusBadRequest,
