@@ -15,14 +15,14 @@ func MakeMatchPaginationPipeline(query url.Values, pipeline *primitive.A) *primi
 	var filterDoc bson.D
 
 	objectID, err := primitive.ObjectIDFromHex(query.Get(jsonID))
-	if err == nil {
+	if err == nil || query.Get(jsonID) != "" {
 		// add new filter document
 		newDoc := bson.D{{Key: jsonID, Value: objectID}}
 		filterDoc = append(filterDoc, newDoc...)
 	}
 
-	productObjectId, err := primitive.ObjectIDFromHex(query.Get(jsonID))
-	if err != nil {
+	productObjectId, err := primitive.ObjectIDFromHex(query.Get(jsonProductID))
+	if err == nil || query.Get(jsonProductID) != "" {
 		newDoc := bson.D{{Key: jsonProductID, Value: productObjectId}}
 		filterDoc = append(filterDoc, newDoc...)
 	}
