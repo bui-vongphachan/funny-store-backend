@@ -67,11 +67,15 @@ func FindById(db *mongo.Database, id *string) *modelproduct.AttributeGroup {
 
 func BindNewData(input *modelproduct.AttributeGroup, data *modelproduct.AttributeGroup) (*modelproduct.AttributeGroup, error) {
 	if input == nil {
-		return nil, errors.New("input is nil")
+		er := errors.New("input is nil")
+		log.Println(er.Error())
+		return nil, er
 	}
 
 	if data == nil {
-		return nil, errors.New("data is empty")
+		er := errors.New("data is empty")
+		log.Println(er.Error())
+		return nil, er
 	}
 
 	if input.Title != "" {
