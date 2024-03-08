@@ -161,10 +161,11 @@ func UpdateOne(db *mongo.Database, filter *bson.M, payload *AttributeGroup) (*At
 }
 
 func CountDocs(db *mongo.Database, filter *bson.D) (*int64, error) {
-	filterOptions := bson.M{}
-	context := context.TODO()
+	if filter == nil {
+		filter = &bson.D{}
+	}
 
-	cursor, err := db.Collection(CollectionName).CountDocuments(context, filterOptions)
+	cursor, err := db.Collection(CollectionName).CountDocuments(context.TODO(), *filter)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
