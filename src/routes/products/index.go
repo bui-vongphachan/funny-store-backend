@@ -29,6 +29,11 @@ func CreateDraft(db *mongo.Database, r *gin.Engine) {
 			AttributeGroup: attributeGroup,
 		})
 
+		serviceproduct.SaveToDatabase(&serviceproduct.SaveToDatabaseProps{
+			DB:      db,
+			Product: product,
+		})
+
 		log.Println(attribute)
 
 		result["data"] = product
