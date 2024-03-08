@@ -1,4 +1,4 @@
-package routeproduct
+package routeproductattributegroup
 
 import (
 	"net/http"
