@@ -29,7 +29,7 @@ func CreateDraft(db *mongo.Database, r *gin.Engine) {
 			AttributeGroup: attributeGroup,
 		})
 
-		serviceproduct.SaveToDatabase(db, product)
+		serviceproduct.Save(db, product)
 
 		serviceproductattributegroup.Save(db, attributeGroup)
 

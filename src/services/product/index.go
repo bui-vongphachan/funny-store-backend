@@ -26,7 +26,7 @@ func CreateEmpty() *model.Product {
 	return &output
 }
 
-func SaveToDatabase(db *mongo.Database, product *model.Product) *model.Product {
+func Save(db *mongo.Database, product *model.Product) *model.Product {
 
 	context := context.TODO()
 
