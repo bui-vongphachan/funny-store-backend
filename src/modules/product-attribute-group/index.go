@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	collectionname "github.com/vongphachan/funny-store-backend/src/constraints/table-names"
 	modelproduct "github.com/vongphachan/funny-store-backend/src/models/products"
 	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	serviceproductattributegroup "github.com/vongphachan/funny-store-backend/src/services/product-attribute-group"
@@ -62,7 +61,7 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 
 		pipeline = *utils.MakeSkipOffsetPipeLine(c.Request.URL.Query(), &pipeline)
 
-		cursor, err := db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).Aggregate(context.TODO(), pipeline)
+		cursor, err := db.Collection(CollectionName).Aggregate(context.TODO(), pipeline)
 		if err != nil {
 			result["message"] = err.Error()
 			c.JSON(http.StatusInternalServerError, result)
