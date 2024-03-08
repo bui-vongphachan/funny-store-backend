@@ -1,9 +1,5 @@
 package product_attribute_group
 
-const jsonID = "_id"
-const jsonTitle = "title"
-const jsonProductID = "productId"
-
 type AttributeGroup struct {
 	ID        string `json:"_id" bson:"_id"`
 	Title     string `json:"title" bson:"title"`
