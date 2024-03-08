@@ -5,9 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	modelproduct "github.com/vongphachan/funny-store-backend/src/models/products"
 	"github.com/vongphachan/funny-store-backend/src/modules/utils"
-	serviceproductattributegroup "github.com/vongphachan/funny-store-backend/src/services/product-attribute-group"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,7 +24,7 @@ func API_Create(db *mongo.Database, r *gin.Engine) {
 			"message": "ຂໍ້ມູນບໍ່ຖືກຕ້ອງ",
 		}
 
-		var requestBody CreateType
+		var requestBody AttributeGroup
 
 		err := c.Bind(&requestBody)
 
@@ -35,9 +33,14 @@ func API_Create(db *mongo.Database, r *gin.Engine) {
 			c.JSON(http.StatusOK, result)
 		}
 
-		attributeGroup := serviceproductattributegroup.CreateEmpty(&requestBody.ProductID)
+		attributeGroup, err := CreateEmpty(&requestBody.ProductID)
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusBadRequest, result)
+			return
+		}
 
-		serviceproductattributegroup.Save(db, attributeGroup)
+		Save(db, attributeGroup)
 
 		result["data"] = attributeGroup
 
@@ -91,7 +94,7 @@ func API_Update(db *mongo.Database, r *gin.Engine) {
 
 		attributeGroupId := c.Param("id")
 
-		attributeGroup := serviceproductattributegroup.FindById(db, &attributeGroupId)
+		attributeGroup := FindById(db, &attributeGroupId)
 		if attributeGroup == nil {
 			result["status"] = 404
 			result["message"] = "Data not found"
@@ -99,7 +102,7 @@ func API_Update(db *mongo.Database, r *gin.Engine) {
 			return
 		}
 
-		var requestBody modelproduct.AttributeGroup
+		var requestBody AttributeGroup
 
 		err := c.Bind(&requestBody)
 		if err != nil {
@@ -107,7 +110,7 @@ func API_Update(db *mongo.Database, r *gin.Engine) {
 			c.JSON(http.StatusOK, result)
 		}
 
-		newData, err := serviceproductattributegroup.BindNewData(&requestBody, attributeGroup)
+		newData, err := BindNewData(&requestBody, attributeGroup)
 		if err != nil {
 			result["status"] = 403
 			result["message"] = "Invalid data"
@@ -116,7 +119,7 @@ func API_Update(db *mongo.Database, r *gin.Engine) {
 		}
 
 		filter := bson.M{"_id": attributeGroup.ID}
-		serviceproductattributegroup.UpdateOne(db, &filter, newData)
+		UpdateOne(db, &filter, newData)
 
 		result["status"] = 200
 		result["isError"] = false
