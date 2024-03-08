@@ -49,7 +49,7 @@ func Create(db *mongo.Database, r *gin.Engine) {
 func Pagination(db *mongo.Database, r *gin.Engine) {
 	r.GET("/product/attribute-group", func(c *gin.Context) {
 		result := gin.H{
-			"status":  400,
+			"status":  http.StatusBadRequest,
 			"isError": true,
 			"data":    nil,
 			"message": "ຂໍ້ມູນບໍ່ຖືກຕ້ອງ",
@@ -59,9 +59,20 @@ func Pagination(db *mongo.Database, r *gin.Engine) {
 
 		pipeline = *MakeMatchPaginationPipeline(c.Request.URL.Query(), &pipeline)
 
-		context := context.TODO()
+		cursor, err := db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).Aggregate(context.TODO(), pipeline)
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusInternalServerError, result)
+			return
+		}
 
-		db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).Aggregate(context, pipeline)
+		// Decode results
+		var results []AttributeGroup
+		if err := cursor.All(context.TODO(), &results); err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusInternalServerError, result)
+			return
+		}
 
 		c.JSON(http.StatusOK, result)
 	})
