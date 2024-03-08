@@ -1,7 +1,6 @@
 package routeproduct
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +32,7 @@ func CreateDraft(db *mongo.Database, r *gin.Engine) {
 
 		serviceproductattributegroup.Save(db, attributeGroup)
 
-		log.Println(attribute)
+		serviceproductattribute.Save(db, attribute)
 
 		result["data"] = product
 
