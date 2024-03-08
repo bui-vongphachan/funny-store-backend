@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func MakeMatchPaginationPipeline(query url.Values) *bson.D {
+func MakeMatchPaginationPipeline(query url.Values, pipeline *primitive.A) *primitive.A {
 	var filterDoc bson.D
 
 	objectID, err := primitive.ObjectIDFromHex(query.Get(jsonID))
@@ -38,5 +38,7 @@ func MakeMatchPaginationPipeline(query url.Values) *bson.D {
 		filterDoc = append(filterDoc, newDoc...)
 	}
 
-	return &filterDoc
+	*pipeline = append(*pipeline, filterDoc)
+
+	return pipeline
 }

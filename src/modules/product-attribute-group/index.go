@@ -55,13 +55,11 @@ func Pagination(db *mongo.Database, r *gin.Engine) {
 			"message": "ຂໍ້ມູນບໍ່ຖືກຕ້ອງ",
 		}
 
-		filter := MakeMatchPaginationPipeline(c.Request.URL.Query())
-
-		context := context.TODO()
-
 		pipeline := bson.A{}
 
-		pipeline = append(pipeline, filter)
+		pipeline = *MakeMatchPaginationPipeline(c.Request.URL.Query(), &pipeline)
+
+		context := context.TODO()
 
 		db.Collection(collectionname.PRODUCT_ATTRIBUTE_GROUPS).Aggregate(context, pipeline)
 
