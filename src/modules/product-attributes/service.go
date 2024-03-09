@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/url"
 
+	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -66,23 +67,11 @@ func CountDocs(db *mongo.Database, filter *bson.D) (*int64, error) {
 func MakeMatchPaginationPipeline(query url.Values) *bson.D {
 	var matchStage bson.D
 
-	objectID, err := primitive.ObjectIDFromHex(query.Get(jsonID))
-	if err == nil || query.Get(jsonID) != "" {
-		newDoc := bson.E{Key: jsonID, Value: objectID}
-		matchStage = append(matchStage, newDoc)
-	}
+	utils.MakeObjectIdDocument(jsonID, query.Get(jsonID), &matchStage)
 
-	attributeGroupObjectId, err := primitive.ObjectIDFromHex(query.Get(jsonAttributeGroupId))
-	if err == nil || query.Get(jsonAttributeGroupId) != "" {
-		newDoc := bson.E{Key: jsonAttributeGroupId, Value: attributeGroupObjectId}
-		matchStage = append(matchStage, newDoc)
-	}
+	utils.MakeObjectIdDocument(jsonAttributeGroupId, query.Get(jsonAttributeGroupId), &matchStage)
 
-	productObjectId, err := primitive.ObjectIDFromHex(query.Get(jsonProductId))
-	if err == nil || query.Get(jsonProductId) != "" {
-		newDoc := bson.E{Key: jsonProductId, Value: productObjectId}
-		matchStage = append(matchStage, newDoc)
-	}
+	utils.MakeObjectIdDocument(jsonProductId, query.Get(jsonProductId), &matchStage)
 
 	if query.Has(jsonTitle) && query.Get(jsonTitle) != "" {
 		regexOptions := bson.D{{
