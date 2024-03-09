@@ -10,6 +10,7 @@ import (
 	product_attribute_group "github.com/vongphachan/funny-store-backend/src/modules/product-attribute-group"
 	product_attribute "github.com/vongphachan/funny-store-backend/src/modules/product-attributes"
 	product_variations "github.com/vongphachan/funny-store-backend/src/modules/product-variations"
+	product_variations_attributes "github.com/vongphachan/funny-store-backend/src/modules/product-variations-attributes"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -57,6 +58,8 @@ func setupRoutes(db *mongo.Database) *gin.Engine {
 
 	product_variations.API_Create(db, router)
 	product_variations.API_Pagination(db, router)
+
+	product_variations_attributes.API_Update(db, router)
 
 	return router
 }
