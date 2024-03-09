@@ -11,7 +11,7 @@ import (
 
 func CreateEmpty() *Product {
 	output := Product{
-		ID:                  primitive.NewObjectID().Hex(),
+		ID:                  primitive.NewObjectID(),
 		Title:               "",
 		Description:         "",
 		PreviewImages:       []string{},
