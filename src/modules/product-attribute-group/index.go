@@ -2,18 +2,14 @@ package product_attribute_group
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-type CreateType struct {
-	ProductID primitive.ObjectID `json:"productId"`
-}
 
 func API_Create(db *mongo.Database, r *gin.Engine) {
 	r.POST("/product/attribute-group", func(c *gin.Context) {
@@ -39,6 +35,8 @@ func API_Create(db *mongo.Database, r *gin.Engine) {
 			c.JSON(http.StatusBadRequest, result)
 			return
 		}
+
+		log.Println("attributeGroup", attributeGroup)
 
 		Save(db, attributeGroup)
 

@@ -49,19 +49,12 @@ func MakeMatchPaginationPipeline(query url.Values) *bson.D {
 	return &matchStage
 }
 
-func CreateEmpty(productId *string) (*AttributeGroup, error) {
-	productObjectId, err := primitive.ObjectIDFromHex(*productId)
-	if err != nil {
-		er := errors.New("invalid product id")
-		log.Println(er.Error())
-		return nil, er
-	}
-
+func CreateEmpty(productId *primitive.ObjectID) (*AttributeGroup, error) {
 	output := AttributeGroup{
-		ID:        primitive.NewObjectID().Hex(),
+		ID:        primitive.NewObjectID(),
 		Title:     "",
 		IsPrimary: true,
-		ProductID: productObjectId.Hex(),
+		ProductID: *productId,
 		Delete:    false,
 	}
 
