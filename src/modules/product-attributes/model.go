@@ -1,14 +1,16 @@
 package product_attribute
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type ProductAttribute struct {
-	ID                string `json:"_id" bson:"_id"`
-	Title             string `json:"title" bson:"title"`
-	Image             string `json:"image,omitempty" bson:"image,omitempty"`
-	ProductID         string `json:"productId" bson:"productId"`
-	AttributeGroupID  string `json:"attributeGroupId" bson:"attributeGroupId"`
-	Delete            bool   `json:"delete" bson:"delete"`
-	CloudflareImageID string `json:"cloudflareImageId,omitempty" bson:"cloudflareImageId,omitempty"`
-	ReuseFrom         string `json:"reuseFrom,omitempty" bson:"reuseFrom,omitempty"`
+	ID                primitive.ObjectID `json:"_id" bson:"_id"`
+	Title             string             `json:"title" bson:"title"`
+	Image             string             `json:"image,omitempty" bson:"image,omitempty"`
+	ProductID         primitive.ObjectID `json:"productId" bson:"productId"`
+	AttributeGroupID  primitive.ObjectID `json:"attributeGroupId" bson:"attributeGroupId"`
+	Delete            bool               `json:"delete" bson:"delete"`
+	CloudflareImageID string             `json:"cloudflareImageId,omitempty" bson:"cloudflareImageId,omitempty"`
+	ReuseFrom         string             `json:"reuseFrom,omitempty" bson:"reuseFrom,omitempty"`
 }
 
 type PaginationQuery struct {
@@ -16,12 +18,12 @@ type PaginationQuery struct {
 	Skip  int `json:"skip"`
 
 	// extends base type
-	ID                string `json:"_id" bson:"_id"`
-	Title             string `json:"title" bson:"title"`
-	Image             string `json:"image,omitempty" bson:"image,omitempty"`
-	ProductID         string `json:"productId" bson:"productId"`
-	AttributeGroupID  string `json:"attributeGroupId" bson:"attributeGroupId"`
-	Delete            bool   `json:"delete" bson:"delete"`
-	CloudflareImageID string `json:"cloudflareImageId,omitempty" bson:"cloudflareImageId,omitempty"`
-	ReuseFrom         string `json:"reuseFrom,omitempty" bson:"reuseFrom,omitempty"`
+	ID                primitive.ObjectID `json:"_id" bson:"_id"`
+	Title             string             `json:"title" bson:"title"`
+	Image             string             `json:"image,omitempty" bson:"image,omitempty"`
+	ProductID         primitive.ObjectID `json:"productId" bson:"productId"`
+	AttributeGroupID  primitive.ObjectID `json:"attributeGroupId" bson:"attributeGroupId"`
+	Delete            bool               `json:"delete" bson:"delete"`
+	CloudflareImageID string             `json:"cloudflareImageId,omitempty" bson:"cloudflareImageId,omitempty"`
+	ReuseFrom         string             `json:"reuseFrom,omitempty" bson:"reuseFrom,omitempty"`
 }
