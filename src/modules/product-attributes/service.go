@@ -2,6 +2,7 @@ package product_attribute
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/url"
 
@@ -102,4 +103,76 @@ func MakeMatchPaginationPipeline(query url.Values) *bson.D {
 	}
 
 	return &matchStage
+}
+
+func FindById(db *mongo.Database, id *string) (*ProductAttribute, error) {
+	context := context.TODO()
+
+	objectID, err := primitive.ObjectIDFromHex(*id)
+	if err != nil {
+		log.Fatalln(err.Error())
+		return nil, err
+	}
+
+	filter := bson.M{"_id": objectID}
+
+	cursor := db.Collection(CollectionName).FindOne(context, filter)
+	if cursor.Err() != nil {
+		log.Fatalln(cursor.Err().Error())
+		return nil, cursor.Err()
+	}
+
+	var result ProductAttribute
+	if err := cursor.Decode(&result); err != nil {
+		log.Fatalln(err.Error())
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func BindNewData(input *ProductAttribute, data *ProductAttribute) (*ProductAttribute, error) {
+	if input == nil {
+		er := errors.New("input is nil")
+		log.Println(er.Error())
+		return nil, er
+	}
+
+	if data == nil {
+		er := errors.New("data is empty")
+		log.Println(er.Error())
+		return nil, er
+	}
+
+	if input.Title != "" {
+		data.Title = input.Title
+	}
+
+	data.Delete = input.Delete
+
+	return data, nil
+}
+
+func UpdateOne(db *mongo.Database, filter *bson.M, payload *ProductAttribute) (*ProductAttribute, error) {
+
+	context := context.TODO()
+
+	update := bson.M{"$set": payload}
+
+	result, err := db.Collection(CollectionName).UpdateOne(context, filter, update)
+	if err != nil {
+		er := errors.New("unable to update product attribute")
+		log.Println(er.Error())
+		return nil, er
+	}
+
+	if result.MatchedCount == 0 {
+		log.Println("attribute not product matched")
+	}
+
+	if result.ModifiedCount == 0 {
+		log.Println("attribute not product updated")
+	}
+
+	return payload, nil
 }

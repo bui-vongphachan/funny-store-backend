@@ -94,3 +94,49 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 		c.JSON(http.StatusOK, result)
 	})
 }
+
+func API_Update(db *mongo.Database, r *gin.Engine) {
+	r.PATCH("/products/attributes/:id", func(c *gin.Context) {
+		result := gin.H{
+			"status":  400,
+			"isError": true,
+			"data":    nil,
+			"message": "Unable to update",
+		}
+
+		attributeGroupId := c.Param("id")
+
+		attributeGroup, err := FindById(db, &attributeGroupId)
+		if err != nil || attributeGroup == nil {
+			result["status"] = 404
+			result["message"] = err.Error()
+			c.JSON(http.StatusOK, result)
+			return
+		}
+
+		var requestBody ProductAttribute
+		if err := c.Bind(&requestBody); err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusOK, result)
+		}
+
+		newData, err := BindNewData(&requestBody, attributeGroup)
+		if err != nil {
+			result["status"] = 403
+			result["message"] = "Invalid data"
+			c.JSON(http.StatusOK, result)
+			return
+		}
+
+		filter := bson.M{"_id": attributeGroup.ID}
+		UpdateOne(db, &filter, newData)
+
+		result["status"] = 200
+		result["isError"] = false
+		result["message"] = "Updated"
+		result["data"] = newData
+
+		c.JSON(http.StatusOK, result)
+	})
+
+}

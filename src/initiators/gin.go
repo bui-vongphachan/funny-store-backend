@@ -48,6 +48,7 @@ func setupRoutes(db *mongo.Database) *gin.Engine {
 
 	product_attribute.API_Create(db, router)
 	product_attribute.API_Pagination(db, router)
+	product_attribute.API_Update(db, router)
 
 	product_attribute_group.API_Create(db, router)
 	product_attribute_group.API_Pagination(db, router)
