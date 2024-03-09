@@ -59,7 +59,9 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 		matchStage := MakeMatchPaginationPipeline(c.Request.URL.Query())
 
 		if matchStage != nil {
-			pipelines = append(pipelines, bson.D{{Key: "$match", Value: *matchStage}})
+			if len(*matchStage) > 0 {
+				pipelines = append(pipelines, bson.D{{Key: "$match", Value: *matchStage}})
+			}
 		}
 
 		makePaginationQuery := utils.MakePaginationQueryType{

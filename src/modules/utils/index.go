@@ -91,7 +91,7 @@ func MakePaginationQuery(props *MakePaginationQueryType) (*[]bson.M, error) {
 }
 
 func CountDocs(db *mongo.Database, filter *bson.D, collectionName string) (*int64, error) {
-	if filter == nil {
+	if filter == nil || len(*filter) == 0 {
 		filter = &bson.D{}
 	}
 
