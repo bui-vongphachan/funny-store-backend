@@ -29,7 +29,7 @@ func MakeMatchPaginationPipeline(query url.Values) *bson.D {
 			Value: "i",
 		}}
 
-		newDoc := bson.E{Key: "title", Value: regexOptions}
+		newDoc := bson.E{Key: jsonTitle, Value: regexOptions}
 
 		matchStage = append(matchStage, newDoc)
 	}
