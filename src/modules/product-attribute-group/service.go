@@ -68,7 +68,7 @@ func Save(db *mongo.Database, attributeGroup *AttributeGroup) (*AttributeGroup, 
 	result, err := db.Collection(CollectionName).InsertOne(context, attributeGroup)
 
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil, err
 	}
 
@@ -86,7 +86,7 @@ func FindById(db *mongo.Database, id *string) (*AttributeGroup, error) {
 
 	objectID, err := primitive.ObjectIDFromHex(*id)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil, err
 	}
 
@@ -94,13 +94,13 @@ func FindById(db *mongo.Database, id *string) (*AttributeGroup, error) {
 
 	result := db.Collection(CollectionName).FindOne(context, filter)
 	if result.Err() != nil {
-		log.Fatalln(result.Err().Error())
+		log.Println(result.Err().Error())
 		return nil, result.Err()
 	}
 
 	var attributeGroup AttributeGroup
 	if err := result.Decode(&attributeGroup); err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil, err
 	}
 

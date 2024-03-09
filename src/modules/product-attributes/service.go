@@ -29,7 +29,7 @@ func Save(db *mongo.Database, payload *ProductAttribute) *ProductAttribute {
 	_, err := db.Collection(CollectionName).InsertOne(context.TODO(), payload)
 
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil
 	}
 
@@ -42,7 +42,7 @@ func SaveBulk(db *mongo.Database, payload *[]interface{}) *[]interface{} {
 	_, err := db.Collection(CollectionName).InsertMany(context, *payload)
 
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil
 	}
 
@@ -110,7 +110,7 @@ func FindById(db *mongo.Database, id *string) (*ProductAttribute, error) {
 
 	objectID, err := primitive.ObjectIDFromHex(*id)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil, err
 	}
 
@@ -118,13 +118,13 @@ func FindById(db *mongo.Database, id *string) (*ProductAttribute, error) {
 
 	cursor := db.Collection(CollectionName).FindOne(context, filter)
 	if cursor.Err() != nil {
-		log.Fatalln(cursor.Err().Error())
+		log.Println(cursor.Err().Error())
 		return nil, cursor.Err()
 	}
 
 	var result ProductAttribute
 	if err := cursor.Decode(&result); err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil, err
 	}
 

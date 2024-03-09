@@ -30,7 +30,7 @@ func Save(db *mongo.Database, product *Product) (*Product, error) {
 	result, err := db.Collection(CollectionName).InsertOne(context.TODO(), product)
 
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println(err.Error())
 		return nil, err
 	}
 
