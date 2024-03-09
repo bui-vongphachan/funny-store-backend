@@ -15,7 +15,7 @@ func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
 			"status":  http.StatusBadRequest,
 			"isError": true,
 			"data":    nil,
-			"message": "ຂໍ້ມູນບໍ່ຖືກຕ້ອງ",
+			"message": "Invalid data",
 		}
 
 		product := CreateEmpty()
@@ -48,7 +48,7 @@ func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
 		result["data"] = product
 		result["status"] = http.StatusCreated
 		result["isError"] = false
-		result["message"] = "ສໍາເລັດ"
+		result["message"] = "Success"
 
 		c.JSON(http.StatusOK, result)
 	})

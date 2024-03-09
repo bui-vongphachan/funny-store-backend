@@ -15,7 +15,7 @@ func API_Create(db *mongo.Database, r *gin.Engine) {
 			"status":  400,
 			"isError": true,
 			"data":    nil,
-			"message": "ຂໍ້ມູນບໍ່ຖືກຕ້ອງ",
+			"message": "Invalid data",
 		}
 
 		var requestBody ProductAttribute
@@ -49,7 +49,7 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 			"status":  http.StatusBadRequest,
 			"isError": true,
 			"data":    nil,
-			"message": "ຂໍ້ມູນບໍ່ຖືກຕ້ອງ",
+			"message": "Invalid data",
 		}
 
 		pipelines := mongo.Pipeline{}
@@ -89,7 +89,7 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 		result["status"] = http.StatusOK
 		result["isError"] = false
 		result["data"] = output
-		result["message"] = "ສໍາເລັດ"
+		result["message"] = "Success"
 
 		c.JSON(http.StatusOK, result)
 	})
