@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	product_attribute "github.com/vongphachan/funny-store-backend/src/modules/product-attributes"
 	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,6 +35,15 @@ func API_Create(db *mongo.Database, r *gin.Engine) {
 		}
 
 		Save(db, attributeGroup)
+
+		productAttribute, err := product_attribute.CreateEmpty(&requestBody.ProductID, &attributeGroup.ID)
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusBadRequest, result)
+			return
+		}
+
+		product_attribute.Save(db, productAttribute)
 
 		result["data"] = attributeGroup
 		result["status"] = http.StatusCreated
