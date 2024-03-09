@@ -53,6 +53,20 @@ func MakeLimitStage(query *url.Values) *primitive.D {
 	}}
 }
 
+func MakeObjectIdDocument(key string, id string, documents *bson.D) *bson.D {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return documents
+	}
+
+	if objectId != primitive.NilObjectID {
+		newDocument := bson.E{Key: key, Value: objectId}
+		*documents = append(*documents, newDocument)
+	}
+
+	return documents
+}
+
 func MakePaginationQuery(props *MakePaginationQueryType) (*[]bson.M, error) {
 
 	skipStage := MakeSkipStage(&props.UrlQuery)
