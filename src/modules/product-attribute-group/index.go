@@ -1,7 +1,6 @@
 package product_attribute_group
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -63,30 +62,24 @@ func API_Pagination(db *mongo.Database, r *gin.Engine) {
 			pipelines = append(pipelines, bson.D{{Key: "$match", Value: *matchStage}})
 		}
 
-		skipStage := utils.MakeSkipStage(c.Request.URL.Query())
-		pipelines = append(pipelines, *skipStage)
+		makePaginationQuery := utils.MakePaginationQueryType{
+			DB:             db,
+			UrlQuery:       c.Request.URL.Query(),
+			CollectionName: CollectionName,
+			MongoPipeline:  &pipelines,
+		}
 
-		limitStage := utils.MakeLimitStage(c.Request.URL.Query())
-		pipelines = append(pipelines, *limitStage)
-
-		cursor, err := db.Collection(CollectionName).Aggregate(context.TODO(), pipelines)
+		items, err := utils.MakePaginationQuery(&makePaginationQuery)
 		if err != nil {
 			result["message"] = err.Error()
-			c.JSON(http.StatusInternalServerError, result)
+			c.JSON(http.StatusBadRequest, result)
 			return
 		}
 
-		items := []bson.M{}
-		if err := cursor.All(context.TODO(), &items); err != nil {
-			result["message"] = err.Error()
-			c.JSON(http.StatusInternalServerError, result)
-			return
-		}
-
-		totalItems, err := CountDocs(db, matchStage)
+		totalItems, err := utils.CountDocs(db, matchStage, CollectionName)
 		if err != nil {
 			result["message"] = err.Error()
-			c.JSON(http.StatusInternalServerError, result)
+			c.JSON(http.StatusBadRequest, result)
 			return
 		}
 
