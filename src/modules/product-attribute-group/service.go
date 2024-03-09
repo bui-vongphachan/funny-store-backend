@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/url"
 
+	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,18 +15,9 @@ import (
 func MakeMatchPaginationPipeline(query url.Values) *bson.D {
 	var matchStage bson.D
 
-	objectID, err := primitive.ObjectIDFromHex(query.Get(jsonID))
-	if err == nil || query.Get(jsonID) != "" {
-		// add new filter document
-		newDoc := bson.E{Key: jsonID, Value: objectID}
-		matchStage = append(matchStage, newDoc)
-	}
+	utils.MakeObjectIdDocument(jsonID, query.Get(jsonID), &matchStage)
 
-	productObjectId, err := primitive.ObjectIDFromHex(query.Get(jsonProductID))
-	if err == nil || query.Get(jsonProductID) != "" {
-		newDoc := bson.E{Key: jsonProductID, Value: productObjectId}
-		matchStage = append(matchStage, newDoc)
-	}
+	utils.MakeObjectIdDocument(jsonProductID, query.Get(jsonProductID), &matchStage)
 
 	if query.Has(jsonTitle) && query.Get(jsonTitle) != "" {
 		// find any doc that contains the title
