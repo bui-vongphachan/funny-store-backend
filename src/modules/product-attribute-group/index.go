@@ -110,7 +110,7 @@ func API_Update(db *mongo.Database, r *gin.Engine) {
 			"status":  400,
 			"isError": true,
 			"data":    nil,
-			"message": "ຂໍ້ມູນບໍ່ຖືກຕ້ອງ",
+			"message": "Unable to update",
 		}
 
 		attributeGroupId := c.Param("id")
