@@ -2,7 +2,6 @@ package product_attribute_group
 
 import (
 	"context"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,7 +22,6 @@ func API_Create(db *mongo.Database, r *gin.Engine) {
 		var requestBody AttributeGroup
 
 		err := c.Bind(&requestBody)
-
 		if err != nil {
 			result["message"] = err.Error()
 			c.JSON(http.StatusOK, result)
@@ -36,11 +34,12 @@ func API_Create(db *mongo.Database, r *gin.Engine) {
 			return
 		}
 
-		log.Println("attributeGroup", attributeGroup)
-
 		Save(db, attributeGroup)
 
 		result["data"] = attributeGroup
+		result["status"] = http.StatusCreated
+		result["isError"] = false
+		result["message"] = "ສໍາເລັດ"
 
 		c.JSON(http.StatusOK, result)
 	})
