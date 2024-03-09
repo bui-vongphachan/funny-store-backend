@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	product_attribute_group "github.com/vongphachan/funny-store-backend/src/modules/product-attribute-group"
 	product_attribute "github.com/vongphachan/funny-store-backend/src/modules/product-attributes"
+	product_variations "github.com/vongphachan/funny-store-backend/src/modules/product-variations"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -34,6 +35,13 @@ func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
 			return
 		}
 
+		productVariations, err := product_variations.CreateEmpty(&product.ID)
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusOK, result)
+			return
+		}
+
 		saveResult, err := Save(db, product)
 		if err != nil || saveResult == nil {
 			result["message"] = err.Error()
@@ -44,6 +52,8 @@ func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
 		product_attribute_group.Save(db, attributeGroup)
 
 		product_attribute.Save(db, attribute)
+
+		product_variations.Save(db, productVariations)
 
 		result["data"] = product
 		result["status"] = http.StatusCreated
