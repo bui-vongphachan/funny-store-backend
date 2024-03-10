@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -15,6 +16,7 @@ func UpdateAttribute(db *mongo.Database, input *ProductVariationAttribute) (*Pro
 	filter := bson.D{{Key: "$and", Value: bson.A{
 		bson.D{{Key: jsonAttributeGroupId, Value: input.AttributeGroupId}},
 		bson.D{{Key: jsonVariationId, Value: input.VariationId}},
+		bson.D{{Key: jsonProductId, Value: input.ProductId}},
 	}}}
 
 	target := bson.E{Key: jsonAttributeId, Value: input.AttributeId}
@@ -36,4 +38,82 @@ func UpdateAttribute(db *mongo.Database, input *ProductVariationAttribute) (*Pro
 	}
 
 	return nil, nil
+}
+
+func FindAllByProductIdWithPopulation(db *mongo.Database, productId *primitive.ObjectID) (*[]PopulatedProductVariationAttribute, error) {
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: jsonProductId, Value: productId}}}}
+
+	productAttributeLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
+		{Key: "from", Value: "product-attributes"},
+		{Key: "localField", Value: jsonAttributeId},
+		{Key: "foreignField", Value: "_id"},
+		{Key: "as", Value: "attribute"},
+	}}}
+
+	productAttributeUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$attribute"}}}}
+
+	productVariationLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
+		{Key: "from", Value: "product-variations"},
+		{Key: "localField", Value: jsonVariationId},
+		{Key: "foreignField", Value: "_id"},
+		{Key: "as", Value: "variation"},
+	}}}
+
+	productVariationUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$variation"}}}}
+
+	productAttributeGroupLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
+		{Key: "from", Value: "product-attribute-group"},
+		{Key: "localField", Value: jsonAttributeGroupId},
+		{Key: "foreignField", Value: "_id"},
+		{Key: "as", Value: "attributeGroup"},
+	}}}
+
+	productAttributeGroupUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$attributeGroup"}}}}
+
+	cursor, err := db.Collection(CollectionName).Aggregate(context.TODO(), mongo.Pipeline{
+		matchStage,
+		productAttributeLookupStage,
+		productAttributeUnwindStage,
+		productVariationLookupStage,
+		productVariationUnwindStage,
+		productAttributeGroupLookupStage,
+		productAttributeGroupUnwindStage,
+	})
+
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	var result []PopulatedProductVariationAttribute
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func Replicate(props *ReplicateProps) (*[]ProductVariationAttribute, error) {
+
+	items, err := FindAllByProductIdWithPopulation(props.DB, props.TargetProductID)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	newList := []ProductVariationAttribute{}
+
+	for _, item := range *items {
+		newItem := ProductVariationAttribute{
+			ID:               primitive.NewObjectID(),
+			AttributeGroupId: item.AttributeGroup.ID,
+			VariationId:      item.Variation.ID,
+			AttributeId:      item.Attribute.ID,
+		}
+
+		newList = append(newList, newItem)
+	}
+
+	return &newList, nil
 }
