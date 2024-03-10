@@ -5,6 +5,9 @@ import (
 	"errors"
 	"log"
 
+	product_attribute_group "github.com/vongphachan/funny-store-backend/src/modules/product-attribute-group"
+	product_attribute "github.com/vongphachan/funny-store-backend/src/modules/product-attributes"
+	product_variations "github.com/vongphachan/funny-store-backend/src/modules/product-variations"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -44,27 +47,27 @@ func FindAllByProductIdWithPopulation(db *mongo.Database, productId *primitive.O
 	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: jsonProductId, Value: productId}}}}
 
 	productAttributeLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
-		{Key: "from", Value: "product-attributes"},
+		{Key: "from", Value: product_attribute.CollectionName},
 		{Key: "localField", Value: jsonAttributeId},
-		{Key: "foreignField", Value: "_id"},
+		{Key: "foreignField", Value: product_attribute.Field_OrgirinalID},
 		{Key: "as", Value: "attribute"},
 	}}}
 
 	productAttributeUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$attribute"}}}}
 
 	productVariationLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
-		{Key: "from", Value: "product-variations"},
+		{Key: "from", Value: product_variations.CollectionName},
 		{Key: "localField", Value: jsonVariationId},
-		{Key: "foreignField", Value: "_id"},
+		{Key: "foreignField", Value: product_variations.Field_OriginalID},
 		{Key: "as", Value: "variation"},
 	}}}
 
 	productVariationUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$variation"}}}}
 
 	productAttributeGroupLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
-		{Key: "from", Value: "product-attribute-group"},
+		{Key: "from", Value: product_attribute_group.CollectionName},
 		{Key: "localField", Value: jsonAttributeGroupId},
-		{Key: "foreignField", Value: "_id"},
+		{Key: "foreignField", Value: product_attribute_group.Field_OriginalID},
 		{Key: "as", Value: "attributeGroup"},
 	}}}
 
@@ -116,4 +119,32 @@ func Replicate(props *ReplicateProps) (*[]ProductVariationAttribute, error) {
 	}
 
 	return &newList, nil
+}
+
+func RelicateAndSave(props *ReplicateProps) (*[]ProductVariationAttribute, error) {
+	replicatedItems, err := Replicate(props)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	// Convert replicatedItems to []interface{}
+	var items []interface{}
+	for _, item := range *replicatedItems {
+		items = append(items, item)
+	}
+
+	result, err := props.DB.Collection(CollectionName).InsertMany(context.TODO(), items)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	if len(result.InsertedIDs) == 0 {
+		err := errors.New("unable to insert replicated items")
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return replicatedItems, nil
 }

@@ -6,3 +6,5 @@ const jsonID = "_id"
 const jsonTitle = "title"
 const jsonProductID = "productId"
 const jsonDelete = "delete"
+
+const Field_OriginalID = "originalId"
