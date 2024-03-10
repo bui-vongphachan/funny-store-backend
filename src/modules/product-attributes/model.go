@@ -10,7 +10,7 @@ type ProductAttribute struct {
 	AttributeGroupID  primitive.ObjectID `json:"attributeGroupId" bson:"attributeGroupId"`
 	Delete            bool               `json:"delete" bson:"delete"`
 	CloudflareImageID string             `json:"cloudflareImageId,omitempty" bson:"cloudflareImageId,omitempty"`
-	ReuseFrom         string             `json:"reuseFrom,omitempty" bson:"reuseFrom,omitempty"`
+	OrgirinalID       primitive.ObjectID `json:"originalId" bson:"originalId"`
 }
 
 type PaginationQuery struct {
@@ -25,5 +25,5 @@ type PaginationQuery struct {
 	AttributeGroupID  primitive.ObjectID `json:"attributeGroupId" bson:"attributeGroupId"`
 	Delete            bool               `json:"delete" bson:"delete"`
 	CloudflareImageID string             `json:"cloudflareImageId,omitempty" bson:"cloudflareImageId,omitempty"`
-	ReuseFrom         string             `json:"reuseFrom,omitempty" bson:"reuseFrom,omitempty"`
+	OrgirinalID       primitive.ObjectID `json:"originalId" bson:"originalId"`
 }
