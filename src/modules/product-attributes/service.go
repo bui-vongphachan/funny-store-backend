@@ -37,33 +37,6 @@ func Save(db *mongo.Database, payload *ProductAttribute) *ProductAttribute {
 	return payload
 }
 
-func SaveBulk(db *mongo.Database, payload *[]interface{}) *[]interface{} {
-	context := context.TODO()
-
-	_, err := db.Collection(CollectionName).InsertMany(context, *payload)
-
-	if err != nil {
-		log.Println(err.Error())
-		return nil
-	}
-
-	return payload
-}
-
-func CountDocs(db *mongo.Database, filter *bson.D) (*int64, error) {
-	if filter == nil {
-		filter = &bson.D{}
-	}
-
-	cursor, err := db.Collection(CollectionName).CountDocuments(context.TODO(), *filter)
-	if err != nil {
-		log.Println(err.Error())
-		return nil, err
-	}
-
-	return &cursor, err
-}
-
 func MakeMatchPaginationPipeline(query url.Values) *bson.D {
 	var matchStage bson.D
 
