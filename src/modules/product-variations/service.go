@@ -108,3 +108,24 @@ func FindAllByProductId(db *mongo.Database, productId *string) ([]*ProductVariat
 
 	return results, nil
 }
+
+func Replicate(productId *primitive.ObjectID, inputs *[]ProductVariation) *[]ProductVariation {
+
+	newList := *inputs
+
+	for index, item := range newList {
+
+		newList[index] = ProductVariation{
+			ID:              primitive.ObjectID{},
+			ProductID:       *productId,
+			IsSingleVariant: item.IsSingleVariant,
+			Stock:           item.Stock,
+			Price:           item.Price,
+			Delete:          item.Delete,
+			OriginalID:      item.ID,
+		}
+
+	}
+
+	return &newList
+}
