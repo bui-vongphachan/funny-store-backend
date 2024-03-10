@@ -144,3 +144,28 @@ func UpdateOne(db *mongo.Database, filter *bson.M, payload *AttributeGroup) (*At
 
 	return payload, nil
 }
+
+func FindAllByProductId(db *mongo.Database, id *string, targetId *string) (*[]AttributeGroup, error) {
+
+	targetObjectID, err := primitive.ObjectIDFromHex(*targetId)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	filter := bson.D{{Key: jsonProductID, Value: targetObjectID}, {Key: jsonDelete, Value: false}}
+
+	cursor, err := db.Collection(CollectionName).Find(context.TODO(), filter)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	items := []AttributeGroup{}
+	if err := cursor.All(context.TODO(), &items); err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return &items, nil
+}
