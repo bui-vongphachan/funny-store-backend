@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/url"
 	"strconv"
@@ -51,6 +52,19 @@ func MakeLimitStage(query *url.Values) *primitive.D {
 		Key:   "$skip",
 		Value: skip,
 	}}
+}
+
+func MakeObjectId(id string) (*primitive.ObjectID, error) {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if objectId == primitive.NilObjectID {
+		return nil, errors.New("invalid object id")
+	}
+
+	return &objectId, nil
 }
 
 func MakeObjectIdDocument(key string, id string, documents *bson.D) *bson.D {

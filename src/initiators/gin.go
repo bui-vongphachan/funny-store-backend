@@ -47,6 +47,7 @@ func setupRoutes(db *mongo.Database) *gin.Engine {
 	router.SetTrustedProxies([]string{CURRENT_PROXY})
 
 	product.API_CreateDraft(db, router)
+	product.API_Replicate(db, router)
 
 	product_attribute.API_Create(db, router)
 	product_attribute.API_Pagination(db, router)

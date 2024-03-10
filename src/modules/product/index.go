@@ -7,6 +7,7 @@ import (
 	product_attribute_group "github.com/vongphachan/funny-store-backend/src/modules/product-attribute-group"
 	product_attribute "github.com/vongphachan/funny-store-backend/src/modules/product-attributes"
 	product_variations "github.com/vongphachan/funny-store-backend/src/modules/product-variations"
+	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -63,4 +64,56 @@ func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
 		c.JSON(http.StatusOK, result)
 	})
 
+}
+
+func API_Replicate(db *mongo.Database, r *gin.Engine) {
+	r.POST("/product/replicate", func(c *gin.Context) {
+		result := gin.H{
+			"status":  http.StatusBadRequest,
+			"isError": true,
+			"data":    nil,
+			"message": "Invalid data",
+		}
+
+		var requestBody PropsReplicateAPI
+
+		err := c.Bind(&requestBody)
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusOK, result)
+			return
+		}
+
+		sourceProductId, err := utils.MakeObjectId(requestBody.SourceProductID)
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusOK, result)
+			return
+		}
+
+		targetProductId, err := utils.MakeObjectId(requestBody.TargetProductID)
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusOK, result)
+			return
+		}
+
+		product, err := Replicate(&ReplicateProps{
+			DB:              db,
+			SourceProductID: sourceProductId,
+			TargetProductID: targetProductId,
+		})
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusOK, result)
+			return
+		}
+
+		result["data"] = product
+		result["status"] = http.StatusCreated
+		result["isError"] = false
+		result["message"] = "Success"
+
+		c.JSON(http.StatusOK, result)
+	})
 }

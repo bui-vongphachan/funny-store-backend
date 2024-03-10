@@ -42,3 +42,37 @@ func Save(db *mongo.Database, product *Product) (*Product, error) {
 
 	return product, nil
 }
+
+func FindByID(db *mongo.Database, id *primitive.ObjectID) (*Product, error) {
+	filter := primitive.D{{Key: Field_ID, Value: id}}
+
+	var product Product
+	err := db.Collection(CollectionName).FindOne(context.TODO(), filter).Decode(&product)
+
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return &product, nil
+}
+
+func Replicate(props *ReplicateProps) (*Product, error) {
+	originalProduct, err := FindByID(props.DB, props.SourceProductID)
+	if err != nil {
+		return nil, err
+	}
+
+	originalProduct.ID = primitive.NewObjectID()
+	originalProduct.OriginalID = *props.TargetProductID
+	originalProduct.IsDraft = true
+	originalProduct.Delete = false
+	originalProduct.Title = originalProduct.Title + " (Copy)"
+
+	_, err = Save(props.DB, originalProduct)
+	if err != nil {
+		return nil, err
+	}
+
+	return originalProduct, nil
+}

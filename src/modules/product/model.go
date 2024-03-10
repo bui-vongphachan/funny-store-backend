@@ -1,6 +1,9 @@
 package product
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type Product struct {
 	ID                  primitive.ObjectID `json:"_id" bson:"_id"`
@@ -12,6 +15,7 @@ type Product struct {
 	HavingSingleVariant bool               `json:"havingSingleVariant" bson:"havingSingleVariant"`
 	Image               string             `json:"image,omitempty" bson:"image,omitempty"`
 	IsDraft             bool               `json:"isDraft" bson:"isDraft"`
+	OriginalID          primitive.ObjectID `json:"originalId" bson:"originalId"`
 }
 
 type PaginationQuery struct {
@@ -28,4 +32,15 @@ type PaginationQuery struct {
 	HavingSingleVariant bool               `json:"havingSingleVariant" bson:"havingSingleVariant"`
 	Image               string             `json:"image,omitempty" bson:"image,omitempty"`
 	IsDraft             bool               `json:"isDraft" bson:"isDraft"`
+}
+
+type ReplicateProps struct {
+	DB              *mongo.Database
+	TargetProductID *primitive.ObjectID
+	SourceProductID *primitive.ObjectID
+}
+
+type PropsReplicateAPI struct {
+	TargetProductID string `json:"targetProductId"`
+	SourceProductID string `json:"sourceProductId"`
 }
