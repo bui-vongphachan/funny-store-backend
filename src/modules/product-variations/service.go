@@ -80,3 +80,31 @@ func BindNewData(input *ProductVariation, data *ProductVariation) (*ProductVaria
 
 	return data, nil
 }
+
+func FindAllByProductId(db *mongo.Database, productId *string) ([]*ProductVariation, error) {
+	context := context.TODO()
+
+	objectID, err := primitive.ObjectIDFromHex(*productId)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	pipelines := mongo.Pipeline{
+		bson.D{{Key: "$match", Value: bson.D{{Key: jsonProductID, Value: objectID}, {Key: jsonDelete, Value: false}}}},
+	}
+
+	cursor, err := db.Collection(CollectionName).Aggregate(context, pipelines)
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	var results []*ProductVariation
+	if err = cursor.All(context, &results); err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return results, nil
+}
