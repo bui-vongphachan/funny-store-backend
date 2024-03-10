@@ -9,6 +9,7 @@ type ProductVariation struct {
 	Stock           int                `json:"stock" bson:"stock"`
 	Price           float64            `json:"price" bson:"price"`
 	Delete          bool               `json:"delete" bson:"delete"`
+	OriginalID      primitive.ObjectID `json:"originalId" bson:"originalId"`
 }
 
 type PaginationQuery struct {
@@ -22,4 +23,5 @@ type PaginationQuery struct {
 	Stock           int                `json:"stock" bson:"stock"`
 	Price           float64            `json:"price" bson:"price"`
 	Delete          bool               `json:"delete" bson:"delete"`
+	OriginalID      primitive.ObjectID `json:"originalId" bson:"originalId"`
 }
