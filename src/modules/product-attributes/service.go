@@ -166,3 +166,23 @@ func FindAllByProductId(db *mongo.Database, productId *string) ([]*ProductAttrib
 
 	return result, nil
 }
+
+func Replicate(productId *primitive.ObjectID, input *[]ProductAttribute) *[]ProductAttribute {
+
+	newList := *input
+
+	for index, item := range *input {
+
+		newList[index] = ProductAttribute{
+			ID:               primitive.NewObjectID(),
+			Title:            item.Title,
+			Image:            item.Image,
+			ProductID:        *productId,
+			AttributeGroupID: item.AttributeGroupID,
+			Delete:           item.Delete,
+			OrgirinalID:      item.ID,
+		}
+	}
+
+	return &newList
+}

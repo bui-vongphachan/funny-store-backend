@@ -170,7 +170,7 @@ func FindAllByProductId(db *mongo.Database, productId *string) (*[]AttributeGrou
 	return &items, nil
 }
 
-func MakeNewObjectId(input *[]AttributeGroup) *[]AttributeGroup {
+func Replicate(productId *primitive.ObjectID, input *[]AttributeGroup) *[]AttributeGroup {
 
 	newList := *input
 
@@ -180,7 +180,7 @@ func MakeNewObjectId(input *[]AttributeGroup) *[]AttributeGroup {
 			ID:         primitive.NewObjectID(),
 			Title:      item.Title,
 			IsPrimary:  item.IsPrimary,
-			ProductID:  item.ProductID,
+			ProductID:  *productId,
 			Delete:     item.Delete,
 			OriginalID: item.ID,
 		}
