@@ -169,3 +169,22 @@ func FindAllByProductId(db *mongo.Database, productId *string) (*[]AttributeGrou
 
 	return &items, nil
 }
+
+func MakeCopy(input *[]AttributeGroup) *[]AttributeGroup {
+
+	newList := *input
+
+	for index, item := range *input {
+
+		newList[index] = AttributeGroup{
+			ID:         primitive.NewObjectID(),
+			Title:      item.Title,
+			IsPrimary:  item.IsPrimary,
+			ProductID:  item.ProductID,
+			Delete:     item.Delete,
+			OriginalID: item.ID,
+		}
+	}
+
+	return &newList
+}
