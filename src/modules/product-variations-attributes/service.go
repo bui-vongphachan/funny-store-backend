@@ -43,8 +43,8 @@ func UpdateAttribute(db *mongo.Database, input *ProductVariationAttribute) (*Pro
 	return nil, nil
 }
 
-func FindAllByProductIdWithDataPopulation(db *mongo.Database, productId *primitive.ObjectID) (*[]PopulatedProductVariationAttribute, error) {
-	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: jsonProductId, Value: productId}}}}
+func FindAllByProductIdWithDataPopulation(props *Props_FindAllByProductIdWithDataPopulation) (*[]PopulatedProductVariationAttribute, error) {
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: Field_ProductId, Value: props.ProductID}}}}
 
 	productAttributeLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: product_attribute.CollectionName},
@@ -73,7 +73,7 @@ func FindAllByProductIdWithDataPopulation(db *mongo.Database, productId *primiti
 
 	productAttributeGroupUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$attributeGroup"}}}}
 
-	cursor, err := db.Collection(CollectionName).Aggregate(context.TODO(), mongo.Pipeline{
+	cursor, err := props.DB.Collection(CollectionName).Aggregate(*props.SessionContext, mongo.Pipeline{
 		matchStage,
 		productAttributeLookupStage,
 		productAttributeUnwindStage,
@@ -99,20 +99,25 @@ func FindAllByProductIdWithDataPopulation(db *mongo.Database, productId *primiti
 
 func Replicate(props *ReplicateProps) (*[]ProductVariationAttribute, error) {
 
-	items, err := FindAllByProductIdWithDataPopulation(props.DB, props.TargetProductID)
+	items, err := FindAllByProductIdWithDataPopulation(&Props_FindAllByProductIdWithDataPopulation{
+		DB:             props.DB,
+		ProductID:      props.ProductId,
+		SessionContext: props.SessionContext,
+	})
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
 
+	// Convert items to ProductVariationAttribute with new ObjectID and its ancestor's ObjectID
 	newList := []ProductVariationAttribute{}
-
 	for _, item := range *items {
 		newItem := ProductVariationAttribute{
 			ID:               primitive.NewObjectID(),
 			AttributeGroupId: item.AttributeGroup.ID,
 			VariationId:      item.Variation.ID,
 			AttributeId:      item.Attribute.ID,
+			OriginalId:       item.ID,
 		}
 
 		newList = append(newList, newItem)
@@ -134,7 +139,7 @@ func RelicateAndSave(props *ReplicateProps) (*[]ProductVariationAttribute, error
 		items = append(items, item)
 	}
 
-	result, err := props.DB.Collection(CollectionName).InsertMany(context.TODO(), items)
+	result, err := props.DB.Collection(CollectionName).InsertMany(*props.SessionContext, items)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
