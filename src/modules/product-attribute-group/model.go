@@ -1,6 +1,9 @@
 package product_attribute_group
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type AttributeGroup struct {
 	ID         primitive.ObjectID `json:"_id" bson:"_id"`
@@ -22,4 +25,11 @@ type PaginationQuery struct {
 	ProductID  primitive.ObjectID `json:"productId" bson:"productId"`
 	Delete     bool               `json:"delete" bson:"delete"`
 	OriginalID primitive.ObjectID `json:"originalId" bson:"originalId"`
+}
+
+type RelicateProps struct {
+	DB             *mongo.Database
+	NewProductID   *primitive.ObjectID
+	SourceList     *[]AttributeGroup
+	SessionContext *mongo.SessionContext
 }

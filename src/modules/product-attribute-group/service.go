@@ -170,21 +170,49 @@ func FindAllByProductId(db *mongo.Database, productId *string) (*[]AttributeGrou
 	return &items, nil
 }
 
-func Replicate(productId *primitive.ObjectID, input *[]AttributeGroup) *[]AttributeGroup {
+func Replicate(props *RelicateProps) *[]AttributeGroup {
 
-	newList := *input
+	newList := *props.SourceList
 
-	for index, item := range *input {
+	for index, item := range *props.SourceList {
 
 		newList[index] = AttributeGroup{
 			ID:         primitive.NewObjectID(),
 			Title:      item.Title,
 			IsPrimary:  item.IsPrimary,
-			ProductID:  *productId,
+			ProductID:  *props.NewProductID,
 			Delete:     item.Delete,
 			OriginalID: item.ID,
 		}
 	}
 
 	return &newList
+}
+
+func SaveBulk(db *mongo.Database, list *[]AttributeGroup) error {
+	context := context.TODO()
+
+	var documents []interface{}
+	for _, item := range *list {
+		documents = append(documents, item)
+	}
+
+	_, err := db.Collection(CollectionName).InsertMany(context, documents)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func RelicateAndSave(db *mongo.Database, props *RelicateProps) (*[]AttributeGroup, error) {
+	newList := Replicate(props)
+
+	err := SaveBulk(db, newList)
+	if err != nil {
+		return nil, err
+	}
+
+	return newList, nil
 }
