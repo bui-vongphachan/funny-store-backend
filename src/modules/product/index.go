@@ -1,6 +1,7 @@
 package product
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,6 +10,7 @@ import (
 	product_variations "github.com/vongphachan/funny-store-backend/src/modules/product-variations"
 	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
@@ -98,22 +100,50 @@ func API_Replicate(db *mongo.Database, r *gin.Engine) {
 			return
 		}
 
-		product, err := Replicate(&ReplicateProps{
-			DB:              db,
-			SourceProductID: sourceProductId,
-			TargetProductID: targetProductId,
-		})
+		session, err := db.Client().StartSession()
 		if err != nil {
 			result["message"] = err.Error()
 			c.JSON(http.StatusOK, result)
 			return
 		}
 
-		result["data"] = product
-		result["status"] = http.StatusCreated
-		result["isError"] = false
-		result["message"] = "Success"
+		opts := options.Transaction()
+
+		err = mongo.WithSession(context.Background(), session, func(sessionCtx mongo.SessionContext) error {
+			err := session.StartTransaction(opts)
+			if err != nil {
+				return err
+			}
+
+			replicateProps := ReplicateProps{
+				DB:              db,
+				TargetProductID: targetProductId,
+				SourceProductID: sourceProductId,
+				SessionContext:  &sessionCtx,
+			}
+			product, err := Replicate(&replicateProps)
+			if err != nil {
+				session.AbortTransaction(sessionCtx)
+				return err
+			}
+
+			result["data"] = product
+			result["status"] = http.StatusCreated
+			result["isError"] = false
+			result["message"] = "Success"
+
+			session.CommitTransaction(sessionCtx)
+
+			return nil
+		})
+
+		if err != nil {
+			result["message"] = err.Error()
+			c.JSON(http.StatusInternalServerError, result)
+			return
+		}
 
 		c.JSON(http.StatusOK, result)
+
 	})
 }
