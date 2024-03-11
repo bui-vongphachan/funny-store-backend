@@ -43,13 +43,13 @@ func UpdateAttribute(db *mongo.Database, input *ProductVariationAttribute) (*Pro
 	return nil, nil
 }
 
-func FindAllByProductIdWithPopulation(db *mongo.Database, productId *primitive.ObjectID) (*[]PopulatedProductVariationAttribute, error) {
+func FindAllByProductIdWithDataPopulation(db *mongo.Database, productId *primitive.ObjectID) (*[]PopulatedProductVariationAttribute, error) {
 	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: jsonProductId, Value: productId}}}}
 
 	productAttributeLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: product_attribute.CollectionName},
-		{Key: "localField", Value: jsonAttributeId},
-		{Key: "foreignField", Value: product_attribute.Field_OrgirinalID},
+		{Key: "localField", Value: Field_AttributeId},
+		{Key: "foreignField", Value: product_attribute.Field_ID},
 		{Key: "as", Value: "attribute"},
 	}}}
 
@@ -57,7 +57,7 @@ func FindAllByProductIdWithPopulation(db *mongo.Database, productId *primitive.O
 
 	productVariationLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: product_variations.CollectionName},
-		{Key: "localField", Value: jsonVariationId},
+		{Key: "localField", Value: Field_VariationId},
 		{Key: "foreignField", Value: product_variations.Field_OriginalID},
 		{Key: "as", Value: "variation"},
 	}}}
@@ -66,7 +66,7 @@ func FindAllByProductIdWithPopulation(db *mongo.Database, productId *primitive.O
 
 	productAttributeGroupLookupStage := bson.D{{Key: "$lookup", Value: bson.D{
 		{Key: "from", Value: product_attribute_group.CollectionName},
-		{Key: "localField", Value: jsonAttributeGroupId},
+		{Key: "localField", Value: Field_AttibuteGroupId},
 		{Key: "foreignField", Value: product_attribute_group.Field_OriginalID},
 		{Key: "as", Value: "attributeGroup"},
 	}}}
@@ -99,7 +99,7 @@ func FindAllByProductIdWithPopulation(db *mongo.Database, productId *primitive.O
 
 func Replicate(props *ReplicateProps) (*[]ProductVariationAttribute, error) {
 
-	items, err := FindAllByProductIdWithPopulation(props.DB, props.TargetProductID)
+	items, err := FindAllByProductIdWithDataPopulation(props.DB, props.TargetProductID)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
