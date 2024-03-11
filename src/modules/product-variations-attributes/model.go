@@ -14,16 +14,32 @@ type ProductVariationAttribute struct {
 	VariationId      primitive.ObjectID `json:"variationId" bson:"variationId"`
 	AttributeId      primitive.ObjectID `json:"attributeId" bson:"attributeId"`
 	ProductId        primitive.ObjectID `json:"productId" bson:"productId"`
+	OriginalId       primitive.ObjectID `json:"originalId" bson:"originalId"`
 }
 
 type PopulatedProductVariationAttribute struct {
 	Attribute      product_attribute.ProductAttribute
 	Variation      product_variations.ProductVariation
 	AttributeGroup product_attribute_group.AttributeGroup
+
+	// Base struct
+	ID               primitive.ObjectID `json:"_id" bson:"_id"`
+	AttributeGroupId primitive.ObjectID `json:"attributeGroupId" bson:"attributeGroupId"`
+	VariationId      primitive.ObjectID `json:"variationId" bson:"variationId"`
+	AttributeId      primitive.ObjectID `json:"attributeId" bson:"attributeId"`
+	ProductId        primitive.ObjectID `json:"productId" bson:"productId"`
+	OriginalId       primitive.ObjectID `json:"originalId" bson:"originalId"`
 }
 
 type ReplicateProps struct {
 	DB              *mongo.Database
 	TargetProductID *primitive.ObjectID
 	ProductId       *primitive.ObjectID
+	SessionContext  *mongo.SessionContext
+}
+
+type Props_FindAllByProductIdWithDataPopulation struct {
+	DB             *mongo.Database
+	ProductID      *primitive.ObjectID
+	SessionContext *mongo.SessionContext
 }
