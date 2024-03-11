@@ -8,4 +8,5 @@ const jsonProductId string = "productId"
 const jsonAttributeGroupId string = "attributeGroupId"
 const jsonDelete string = "delete"
 
+const Field_ID string = "_id"
 const Field_OrgirinalID string = "originalId"
