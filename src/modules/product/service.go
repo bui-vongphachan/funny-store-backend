@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -43,7 +44,7 @@ func Save(db *mongo.Database, product *Product) (*Product, error) {
 	return product, nil
 }
 
-func FindByID(props *FindByIDProps) (*Product, error) {
+func FindByObjectID(props *FindByObjectIDProps) (*Product, error) {
 	filter := primitive.D{{Key: Field_ID, Value: props.ID}}
 
 	var product Product
@@ -57,8 +58,28 @@ func FindByID(props *FindByIDProps) (*Product, error) {
 	return &product, nil
 }
 
+func FindByID(db *mongo.Database, id *string, sessionContext *mongo.SessionContext) (*Product, error) {
+	objectId, err := utils.MakeObjectId(*id)
+	if err != nil {
+		return nil, err
+	}
+
+	product, err := FindByObjectID(&FindByObjectIDProps{
+		DB:             db,
+		ID:             objectId,
+		SessionContext: sessionContext,
+	})
+
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return product, nil
+}
+
 func Replicate(props *ReplicateProps) (*Product, error) {
-	originalProduct, err := FindByID(&FindByIDProps{
+	originalProduct, err := FindByObjectID(&FindByObjectIDProps{
 		DB:             props.DB,
 		ID:             props.SourceProductID,
 		SessionContext: props.SessionContext,
