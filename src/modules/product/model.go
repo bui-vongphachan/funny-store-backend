@@ -34,10 +34,17 @@ type PaginationQuery struct {
 	IsDraft             bool               `json:"isDraft" bson:"isDraft"`
 }
 
+type FindByIDProps struct {
+	DB             *mongo.Database
+	ID             *primitive.ObjectID
+	SessionContext *mongo.SessionContext
+}
+
 type ReplicateProps struct {
 	DB              *mongo.Database
 	TargetProductID *primitive.ObjectID
 	SourceProductID *primitive.ObjectID
+	SessionContext  *mongo.SessionContext
 }
 
 type PropsReplicateAPI struct {

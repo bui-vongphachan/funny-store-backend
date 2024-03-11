@@ -43,11 +43,11 @@ func Save(db *mongo.Database, product *Product) (*Product, error) {
 	return product, nil
 }
 
-func FindByID(db *mongo.Database, id *primitive.ObjectID) (*Product, error) {
-	filter := primitive.D{{Key: Field_ID, Value: id}}
+func FindByID(props *FindByIDProps) (*Product, error) {
+	filter := primitive.D{{Key: Field_ID, Value: props.ID}}
 
 	var product Product
-	err := db.Collection(CollectionName).FindOne(context.TODO(), filter).Decode(&product)
+	err := props.DB.Collection(CollectionName).FindOne(*props.SessionContext, filter).Decode(&product)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -58,7 +58,11 @@ func FindByID(db *mongo.Database, id *primitive.ObjectID) (*Product, error) {
 }
 
 func Replicate(props *ReplicateProps) (*Product, error) {
-	originalProduct, err := FindByID(props.DB, props.SourceProductID)
+	originalProduct, err := FindByID(&FindByIDProps{
+		DB:             props.DB,
+		ID:             props.SourceProductID,
+		SessionContext: props.SessionContext,
+	})
 	if err != nil {
 		return nil, err
 	}
