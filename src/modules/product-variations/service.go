@@ -129,3 +129,31 @@ func Replicate(productId *primitive.ObjectID, inputs *[]ProductVariation) *[]Pro
 
 	return &newList
 }
+
+func SaveBulk(db *mongo.Database, list *[]ProductVariation) error {
+	context := context.TODO()
+
+	var documents []interface{}
+	for _, item := range *list {
+		documents = append(documents, item)
+	}
+
+	_, err := db.Collection(CollectionName).InsertMany(context, documents)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func ReplicateAndSave(productId *primitive.ObjectID, list *[]ProductVariation, db *mongo.Database, sessionContext *mongo.SessionContext) (*[]ProductVariation, error) {
+	replicatedItems := Replicate(productId, list)
+
+	err := SaveBulk(db, replicatedItems)
+	if err != nil {
+		return nil, err
+	}
+
+	return replicatedItems, nil
+}
