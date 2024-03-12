@@ -31,7 +31,7 @@ type PopulatedProductVariationAttribute struct {
 	OriginalId       primitive.ObjectID `json:"originalId" bson:"originalId"`
 }
 
-type ReplicateProps struct {
+type Props_Replicate struct {
 	DB              *mongo.Database
 	TargetProductID *primitive.ObjectID
 	ProductId       *primitive.ObjectID

@@ -97,7 +97,7 @@ func FindAllByProductIdWithDataPopulation(props *Props_FindAllByProductIdWithDat
 	return &result, nil
 }
 
-func Replicate(props *ReplicateProps) (*[]ProductVariationAttribute, error) {
+func Replicate(props *Props_Replicate) (*[]ProductVariationAttribute, error) {
 
 	items, err := FindAllByProductIdWithDataPopulation(&Props_FindAllByProductIdWithDataPopulation{
 		DB:             props.DB,
@@ -126,7 +126,7 @@ func Replicate(props *ReplicateProps) (*[]ProductVariationAttribute, error) {
 	return &newList, nil
 }
 
-func RelicateAndSave(props *ReplicateProps) (*[]ProductVariationAttribute, error) {
+func RelicateAndSave(props *Props_Replicate) (*[]ProductVariationAttribute, error) {
 	replicatedItems, err := Replicate(props)
 	if err != nil {
 		log.Println(err.Error())
