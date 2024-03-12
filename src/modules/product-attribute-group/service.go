@@ -172,7 +172,7 @@ func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *m
 
 func Replicate(props *Props_Relicate) *[]AttributeGroup {
 
-	newList := *props.SourceList
+	newList := make([]AttributeGroup, len(*props.SourceList))
 
 	for index, item := range *props.SourceList {
 
