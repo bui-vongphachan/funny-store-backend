@@ -170,17 +170,17 @@ func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *m
 	return &items, nil
 }
 
-func Replicate(props *Props_Relicate) *[]AttributeGroup {
+func Replicate(newProductID *primitive.ObjectID, sourceList *[]AttributeGroup) *[]AttributeGroup {
 
-	newList := make([]AttributeGroup, len(*props.SourceList))
+	newList := make([]AttributeGroup, len(*sourceList))
 
-	for index, item := range *props.SourceList {
+	for index, item := range *sourceList {
 
 		newList[index] = AttributeGroup{
 			ID:         primitive.NewObjectID(),
 			Title:      item.Title,
 			IsPrimary:  item.IsPrimary,
-			ProductID:  *props.NewProductID,
+			ProductID:  *newProductID,
 			Delete:     item.Delete,
 			OriginalID: item.ID,
 		}
@@ -206,10 +206,10 @@ func SaveBulk(db *mongo.Database, list *[]AttributeGroup) error {
 	return nil
 }
 
-func RelicateAndSave(db *mongo.Database, props *Props_Relicate) (*[]AttributeGroup, error) {
-	newList := Replicate(props)
+func RelicateAndSave(props *Props_Relicate) (*[]AttributeGroup, error) {
+	newList := Replicate(props.NewProductID, props.SourceList)
 
-	err := SaveBulk(db, newList)
+	err := SaveBulk(props.DB, newList)
 	if err != nil {
 		return nil, err
 	}

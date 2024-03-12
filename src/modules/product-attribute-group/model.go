@@ -28,8 +28,8 @@ type PaginationQuery struct {
 }
 
 type Props_Relicate struct {
-	DB             *mongo.Database
 	NewProductID   *primitive.ObjectID
 	SourceList     *[]AttributeGroup
+	DB             *mongo.Database
 	SessionContext *mongo.SessionContext
 }
