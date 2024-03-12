@@ -166,11 +166,11 @@ func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *m
 	return &result, nil
 }
 
-func Replicate(productId *primitive.ObjectID, input *[]ProductAttribute) *[]ProductAttribute {
+func Replicate(productId *primitive.ObjectID, list *[]ProductAttribute) *[]ProductAttribute {
 
-	newList := make([]ProductAttribute, len(*input))
+	newList := make([]ProductAttribute, len(*list))
 
-	for index, item := range *input {
+	for index, item := range *list {
 
 		newList[index] = ProductAttribute{
 			ID:               primitive.NewObjectID(),
@@ -184,4 +184,32 @@ func Replicate(productId *primitive.ObjectID, input *[]ProductAttribute) *[]Prod
 	}
 
 	return &newList
+}
+
+func SaveBulk(db *mongo.Database, list *[]ProductAttribute) error {
+	context := context.TODO()
+
+	var documents []interface{}
+	for _, item := range *list {
+		documents = append(documents, item)
+	}
+
+	_, err := db.Collection(CollectionName).InsertMany(context, documents)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func ReplicateAndSave(productId *primitive.ObjectID, list *[]ProductAttribute, db *mongo.Database, sessionContext *mongo.SessionContext) (*[]ProductAttribute, error) {
+	replicatedItems := Replicate(productId, list)
+
+	err := SaveBulk(db, replicatedItems)
+	if err != nil {
+		return nil, err
+	}
+
+	return replicatedItems, nil
 }
