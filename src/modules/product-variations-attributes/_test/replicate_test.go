@@ -98,4 +98,29 @@ func TestReplicate(t *testing.T) {
 		t.Errorf("Replicate() = %v, want %v", len(*newVariationAttributes), len(sourceVariationAttributes))
 	}
 
+	for i, item := range *newVariationAttributes {
+		if item.OriginalId != sourceVariationAttributes[i].ID {
+			t.Errorf("Replicate() = %v, want %v", item.OriginalId, sourceVariationAttributes[i].ID)
+		}
+
+		if item.ProductId != newProductID {
+			t.Errorf("Replicate() = %v, want %v", item.ProductId, newProductID)
+		} else if item.ProductId != sourceProductId {
+			t.Errorf("Replicate() = %v, want %v", item.ProductId, sourceProductId)
+		}
+
+		if item.AttributeId != *attributeMap[sourceVariationAttributes[i].AttributeId.String()] {
+			t.Errorf("Replicate() = %v, want %v", item.AttributeId, *attributeMap[sourceVariationAttributes[i].AttributeId.String()])
+		}
+
+		if item.VariationId != *variationMap[sourceVariationAttributes[i].VariationId.String()] {
+			t.Errorf("Replicate() = %v, want %v", item.VariationId, *variationMap[sourceVariationAttributes[i].VariationId.String()])
+		}
+
+		if item.AttributeGroupId != *attributeGroupMap[sourceVariationAttributes[i].AttributeGroupId.String()] {
+			t.Errorf("Replicate() = %v, want %v", item.AttributeGroupId, *attributeGroupMap[sourceVariationAttributes[i].AttributeGroupId.String()])
+		}
+
+		log.Println("newVariationAttributes", item)
+	}
 }
