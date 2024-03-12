@@ -32,7 +32,6 @@ type PopulatedProductVariationAttribute struct {
 }
 
 type Props_Replicate struct {
-	DB              *mongo.Database
 	ProductId       *primitive.ObjectID
 	SourceList      *[]ProductVariationAttribute
 	attributeGroups *map[string]*primitive.ObjectID

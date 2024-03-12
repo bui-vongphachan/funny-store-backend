@@ -120,7 +120,7 @@ func Replicate(props *Props_Replicate) (*[]ProductVariationAttribute, error) {
 	return &newList, nil
 }
 
-func RelicateAndSave(props *Props_Replicate, sessionContext mongo.SessionContext) (*[]ProductVariationAttribute, error) {
+func RelicateAndSave(props *Props_Replicate, db *mongo.Database, sessionContext mongo.SessionContext) (*[]ProductVariationAttribute, error) {
 	replicatedItems, err := Replicate(props)
 	if err != nil {
 		log.Println(err.Error())
@@ -133,7 +133,7 @@ func RelicateAndSave(props *Props_Replicate, sessionContext mongo.SessionContext
 		items = append(items, item)
 	}
 
-	result, err := props.DB.Collection(CollectionName).InsertMany(sessionContext, items)
+	result, err := db.Collection(CollectionName).InsertMany(sessionContext, items)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
