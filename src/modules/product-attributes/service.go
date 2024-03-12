@@ -139,8 +139,7 @@ func UpdateOne(db *mongo.Database, filter *bson.M, payload *ProductAttribute) (*
 	return payload, nil
 }
 
-func FindAllByProductId(db *mongo.Database, productId *string) ([]*ProductAttribute, error) {
-	context := context.TODO()
+func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *mongo.SessionContext) ([]*ProductAttribute, error) {
 
 	objectID, err := primitive.ObjectIDFromHex(*productId)
 	if err != nil {
@@ -152,14 +151,14 @@ func FindAllByProductId(db *mongo.Database, productId *string) ([]*ProductAttrib
 		bson.D{{Key: "$match", Value: bson.D{{Key: jsonProductId, Value: objectID}, {Key: jsonDelete, Value: false}}}},
 	}
 
-	cursor, err := db.Collection(CollectionName).Aggregate(context, pipelines)
+	cursor, err := db.Collection(CollectionName).Aggregate(*sessionContext, pipelines)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
 
 	var result []*ProductAttribute
-	if err := cursor.All(context, &result); err != nil {
+	if err := cursor.All(context.TODO(), &result); err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
