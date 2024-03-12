@@ -139,7 +139,7 @@ func UpdateOne(db *mongo.Database, filter *bson.M, payload *ProductAttribute) (*
 	return payload, nil
 }
 
-func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *mongo.SessionContext) ([]*ProductAttribute, error) {
+func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *mongo.SessionContext) (*[]ProductAttribute, error) {
 
 	objectID, err := primitive.ObjectIDFromHex(*productId)
 	if err != nil {
@@ -157,13 +157,13 @@ func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *m
 		return nil, err
 	}
 
-	var result []*ProductAttribute
+	var result []ProductAttribute
 	if err := cursor.All(context.TODO(), &result); err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
 
-	return result, nil
+	return &result, nil
 }
 
 func Replicate(productId *primitive.ObjectID, input *[]ProductAttribute) *[]ProductAttribute {
