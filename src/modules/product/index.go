@@ -10,6 +10,7 @@ import (
 	product_variations "github.com/vongphachan/funny-store-backend/src/modules/product-variations"
 	product_variations_attributes "github.com/vongphachan/funny-store-backend/src/modules/product-variations-attributes"
 	"github.com/vongphachan/funny-store-backend/src/modules/utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -116,64 +117,138 @@ func API_Replicate(db *mongo.Database, r *gin.Engine) {
 				return err
 			}
 
-			replicateProps := ReplicateProps{
-				DB:              db,
-				TargetProductID: targetProductId,
-				SourceProductID: sourceProductId,
-				SessionContext:  &sessionCtx,
-			}
-			product, err := Replicate(&replicateProps)
-			if err != nil {
-				session.AbortTransaction(sessionCtx)
-				return err
-			}
+			var product *Product
+			var attributeGroups *[]product_attribute_group.AttributeGroup
+			var attributes *[]product_attribute.ProductAttribute
+			var variationAttributes *[]product_variations_attributes.ProductVariationAttribute
+			var variations *[]product_variations.ProductVariation
 
+			attributeMap := map[string]*primitive.ObjectID{}
+			variationMap := map[string]*primitive.ObjectID{}
+			attributeGroupMap := map[string]*primitive.ObjectID{}
+
+			// Retrieve data
 			{
-				_, err := product_attribute_group.FindAllByProductId(db, &requestBody.SourceProductID, &sessionCtx)
-				if err != nil {
-					session.AbortTransaction(sessionCtx)
-					return err
+				// get product data
+				{
+					replicateProps := ReplicateProps{
+						DB:              db,
+						TargetProductID: targetProductId,
+						SourceProductID: sourceProductId,
+						SessionContext:  &sessionCtx,
+					}
+					result, err := Replicate(&replicateProps)
+					if err != nil {
+						session.AbortTransaction(sessionCtx)
+						return err
+					}
+
+					product = result
+				}
+				// get product attribute group data
+				{
+					result, err := product_attribute_group.FindAllByProductId(db, &requestBody.SourceProductID, &sessionCtx)
+					if err != nil {
+						session.AbortTransaction(sessionCtx)
+						return err
+					}
+					attributeGroups = result
+				}
+				// get product attribute data
+				{
+					result, err := product_attribute.FindAllByProductId(db, &requestBody.SourceProductID, &sessionCtx)
+					if err != nil {
+						session.AbortTransaction(sessionCtx)
+						return err
+					}
+					attributes = result
+				}
+				// get product variation data
+				{
+					result, err := product_variations.FindAllByProductId(db, &requestBody.SourceProductID)
+					if err != nil {
+						session.AbortTransaction(sessionCtx)
+						return err
+					}
+					variations = result
+				}
+				// get product variation attribute data
+				{
+					result, err := product_variations_attributes.FindByProductId(
+						db,
+						sourceProductId,
+					)
+					if err != nil {
+						session.AbortTransaction(sessionCtx)
+						return err
+					}
+					variationAttributes = result
 				}
 			}
 
+			// Replicate data
 			{
-				_, err := product_attribute.FindAllByProductId(db, &requestBody.SourceProductID, &sessionCtx)
-				if err != nil {
-					session.AbortTransaction(sessionCtx)
-					return err
+				// replicate product attribute group
+				{
+					updatedItems, err := product_attribute_group.RelicateAndSave(&product_attribute_group.Props_Relicate{
+						DB:             db,
+						NewProductID:   targetProductId,
+						SourceList:     attributeGroups,
+						SessionContext: &sessionCtx,
+					})
+					if err != nil {
+						session.AbortTransaction(sessionCtx)
+						return err
+					}
+					for _, item := range *updatedItems {
+						attributeGroupMap[item.OriginalID.String()] = &item.ID
+					}
 				}
-			}
-
-			{
-				_, err := product_variations.FindAllByProductId(db, &requestBody.SourceProductID)
-				if err != nil {
-					session.AbortTransaction(sessionCtx)
-					return err
+				// replicate product attributes
+				{
+					updatedItems, err := product_attribute.ReplicateAndSave(
+						targetProductId,
+						attributes,
+						db,
+						&sessionCtx,
+					)
+					if err != nil {
+						session.AbortTransaction(sessionCtx)
+						return err
+					}
+					for _, item := range *updatedItems {
+						attributeMap[item.OriginalID.String()] = &item.ID
+					}
 				}
-			}
-
-			{
-				_, err := product_variations_attributes.FindAllByProductIdWithDataPopulation(&product_variations_attributes.Props_FindAllByProductIdWithDataPopulation{
-					DB:             db,
-					ProductID:      sourceProductId,
-					SessionContext: &sessionCtx,
-				})
-				if err != nil {
-					session.AbortTransaction(sessionCtx)
-					return err
+				// replicate product variations
+				{
+					updatedItems, err := product_variations.ReplicateAndSave(
+						targetProductId,
+						variations,
+						db,
+						&sessionCtx,
+					)
+					if err != nil {
+						session.AbortTransaction(sessionCtx)
+						return err
+					}
+					for _, item := range *updatedItems {
+						variationMap[item.OriginalID.String()] = &item.ID
+					}
 				}
-			}
-
-			{
-				_, err := product_variations_attributes.RelicateAndSave(&product_variations_attributes.Props_Replicate{
-					DB:              db,
-					TargetProductID: targetProductId,
-					ProductId:       sourceProductId,
-					SessionContext:  &sessionCtx,
-				})
-				if err != nil {
-					session.AbortTransaction(sessionCtx)
-					return err
+				// replicate product variation attributes
+				{
+					_, err := product_variations_attributes.RelicateAndSave(&product_variations_attributes.Props_Replicate{
+						ProductId:       targetProductId,
+						SourceList:      variationAttributes,
+						AttributeGroups: &attributeGroupMap,
+						Attributes:      &attributeMap,
+						Variations:      &variationMap,
+					}, db, &sessionCtx)
+					if err != nil {
+						session.AbortTransaction(sessionCtx)
+						return err
+					}
 				}
 			}
 
