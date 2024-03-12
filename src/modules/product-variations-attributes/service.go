@@ -97,7 +97,20 @@ func FindAllByProductIdWithDataPopulation(props *Props_FindAllByProductIdWithDat
 	return &result, nil
 }
 
-func FindByProductIdWithOriginalPopulation(props *Props_FindAllByProductIdWithDataPopulation) {
+func FindByProductId(db *mongo.Database, productId *primitive.ObjectID) (*[]ProductVariationAttribute, error) {
+	cursor, err := db.Collection(CollectionName).Find(context.TODO(), bson.D{{Key: jsonProductId, Value: productId}})
+	if err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	var result []ProductVariationAttribute
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		log.Println(err.Error())
+		return nil, err
+	}
+
+	return &result, nil
 
 }
 
@@ -120,7 +133,7 @@ func Replicate(props *Props_Replicate) *[]ProductVariationAttribute {
 	return &newList
 }
 
-func RelicateAndSave(props *Props_Replicate, db *mongo.Database, sessionContext mongo.SessionContext) (*[]ProductVariationAttribute, error) {
+func RelicateAndSave(props *Props_Replicate, db *mongo.Database, sessionContext *mongo.SessionContext) (*[]ProductVariationAttribute, error) {
 	replicatedItems := Replicate(props)
 
 	// Convert replicatedItems to []interface{}
@@ -129,7 +142,7 @@ func RelicateAndSave(props *Props_Replicate, db *mongo.Database, sessionContext 
 		items = append(items, item)
 	}
 
-	result, err := db.Collection(CollectionName).InsertMany(sessionContext, items)
+	result, err := db.Collection(CollectionName).InsertMany(*sessionContext, items)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
