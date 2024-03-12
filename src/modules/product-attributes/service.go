@@ -179,7 +179,7 @@ func Replicate(productId *primitive.ObjectID, input *[]ProductAttribute) *[]Prod
 			ProductID:        *productId,
 			AttributeGroupID: item.AttributeGroupID,
 			Delete:           item.Delete,
-			OrgirinalID:      item.ID,
+			OriginalID:       item.ID,
 		}
 	}
 
