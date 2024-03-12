@@ -1,4 +1,4 @@
-package product_attribute_test
+package product_variations_test
 
 import (
 	"testing"
