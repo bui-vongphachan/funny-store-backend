@@ -81,7 +81,7 @@ func BindNewData(input *ProductVariation, data *ProductVariation) (*ProductVaria
 	return data, nil
 }
 
-func FindAllByProductId(db *mongo.Database, productId *string) ([]*ProductVariation, error) {
+func FindAllByProductId(db *mongo.Database, productId *string) (*[]ProductVariation, error) {
 	context := context.TODO()
 
 	objectID, err := primitive.ObjectIDFromHex(*productId)
@@ -100,13 +100,13 @@ func FindAllByProductId(db *mongo.Database, productId *string) ([]*ProductVariat
 		return nil, err
 	}
 
-	var results []*ProductVariation
+	var results []ProductVariation
 	if err = cursor.All(context, &results); err != nil {
 		log.Println(err.Error())
 		return nil, err
 	}
 
-	return results, nil
+	return &results, nil
 }
 
 func Replicate(productId *primitive.ObjectID, inputs *[]ProductVariation) *[]ProductVariation {
