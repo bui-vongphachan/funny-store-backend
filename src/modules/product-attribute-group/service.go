@@ -145,7 +145,7 @@ func UpdateOne(db *mongo.Database, filter *bson.M, payload *AttributeGroup) (*At
 	return payload, nil
 }
 
-func FindAllByProductId(db *mongo.Database, productId *string) (*[]AttributeGroup, error) {
+func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *mongo.SessionContext) (*[]AttributeGroup, error) {
 
 	targetObjectID, err := primitive.ObjectIDFromHex(*productId)
 	if err != nil {
@@ -155,7 +155,7 @@ func FindAllByProductId(db *mongo.Database, productId *string) (*[]AttributeGrou
 
 	filter := bson.D{{Key: jsonProductID, Value: targetObjectID}, {Key: jsonDelete, Value: false}}
 
-	cursor, err := db.Collection(CollectionName).Find(context.TODO(), filter)
+	cursor, err := db.Collection(CollectionName).Find(*sessionContext, filter)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
