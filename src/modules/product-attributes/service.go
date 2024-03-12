@@ -168,7 +168,7 @@ func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *m
 
 func Replicate(productId *primitive.ObjectID, input *[]ProductAttribute) *[]ProductAttribute {
 
-	newList := *input
+	newList := make([]ProductAttribute, len(*input))
 
 	for index, item := range *input {
 
