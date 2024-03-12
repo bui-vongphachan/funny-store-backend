@@ -32,10 +32,10 @@ type PopulatedProductVariationAttribute struct {
 }
 
 type Props_Replicate struct {
-	DB              *mongo.Database
-	TargetProductID *primitive.ObjectID
-	ProductId       *primitive.ObjectID
-	SessionContext  *mongo.SessionContext
+	DB             *mongo.Database
+	ProductId      *primitive.ObjectID
+	SourceList     *[]PopulatedProductVariationAttribute
+	SessionContext *mongo.SessionContext
 }
 
 type Props_FindAllByProductIdWithDataPopulation struct {
