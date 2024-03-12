@@ -102,19 +102,19 @@ func FindByProductIdWithOriginalPopulation(props *Props_FindAllByProductIdWithDa
 }
 
 func Replicate(props *Props_Replicate) *[]ProductVariationAttribute {
+	// Create new list
+	newList := make([]ProductVariationAttribute, len(*props.SourceList))
 
-	newList := make([]ProductVariationAttribute, 0)
-	for _, item := range *props.SourceList {
-
-		newItem := ProductVariationAttribute{
+	for i, item := range *props.SourceList {
+		newList[i] = ProductVariationAttribute{
 			ID:               primitive.NewObjectID(),
 			AttributeGroupId: *(*props.AttributeGroups)[item.AttributeGroupId.String()],
 			VariationId:      *(*props.Variations)[item.VariationId.String()],
 			AttributeId:      *(*props.Attributes)[item.AttributeId.String()],
 			OriginalId:       item.ID,
+			ProductId:        *props.ProductId,
 		}
 
-		newList = append(newList, newItem)
 	}
 
 	return &newList
