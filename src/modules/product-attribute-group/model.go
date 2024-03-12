@@ -27,7 +27,7 @@ type PaginationQuery struct {
 	OriginalID primitive.ObjectID `json:"originalId" bson:"originalId"`
 }
 
-type RelicateProps struct {
+type Props_Relicate struct {
 	DB             *mongo.Database
 	NewProductID   *primitive.ObjectID
 	SourceList     *[]AttributeGroup

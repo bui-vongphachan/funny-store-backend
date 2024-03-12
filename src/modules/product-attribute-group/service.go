@@ -170,7 +170,7 @@ func FindAllByProductId(db *mongo.Database, productId *string, sessionContext *m
 	return &items, nil
 }
 
-func Replicate(props *RelicateProps) *[]AttributeGroup {
+func Replicate(props *Props_Relicate) *[]AttributeGroup {
 
 	newList := *props.SourceList
 
@@ -206,7 +206,7 @@ func SaveBulk(db *mongo.Database, list *[]AttributeGroup) error {
 	return nil
 }
 
-func RelicateAndSave(db *mongo.Database, props *RelicateProps) (*[]AttributeGroup, error) {
+func RelicateAndSave(db *mongo.Database, props *Props_Relicate) (*[]AttributeGroup, error) {
 	newList := Replicate(props)
 
 	err := SaveBulk(db, newList)
