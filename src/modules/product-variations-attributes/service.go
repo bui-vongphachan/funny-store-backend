@@ -101,31 +101,27 @@ func FindByProductIdWithOriginalPopulation(props *Props_FindAllByProductIdWithDa
 
 }
 
-func Replicate(props *Props_Replicate) (*[]ProductVariationAttribute, error) {
+func Replicate(props *Props_Replicate) *[]ProductVariationAttribute {
 
 	newList := make([]ProductVariationAttribute, 0)
 	for _, item := range *props.SourceList {
 
 		newItem := ProductVariationAttribute{
 			ID:               primitive.NewObjectID(),
-			AttributeGroupId: *(*props.attributeGroups)[item.AttributeGroupId.String()],
-			VariationId:      *(*props.variations)[item.VariationId.String()],
-			AttributeId:      *(*props.attributes)[item.AttributeId.String()],
+			AttributeGroupId: *(*props.AttributeGroups)[item.AttributeGroupId.String()],
+			VariationId:      *(*props.Variations)[item.VariationId.String()],
+			AttributeId:      *(*props.Attributes)[item.AttributeId.String()],
 			OriginalId:       item.ID,
 		}
 
 		newList = append(newList, newItem)
 	}
 
-	return &newList, nil
+	return &newList
 }
 
 func RelicateAndSave(props *Props_Replicate, db *mongo.Database, sessionContext mongo.SessionContext) (*[]ProductVariationAttribute, error) {
-	replicatedItems, err := Replicate(props)
-	if err != nil {
-		log.Println(err.Error())
-		return nil, err
-	}
+	replicatedItems := Replicate(props)
 
 	// Convert replicatedItems to []interface{}
 	var items []interface{}

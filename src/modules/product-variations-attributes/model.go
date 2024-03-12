@@ -34,9 +34,9 @@ type PopulatedProductVariationAttribute struct {
 type Props_Replicate struct {
 	ProductId       *primitive.ObjectID
 	SourceList      *[]ProductVariationAttribute
-	attributeGroups *map[string]*primitive.ObjectID
-	attributes      *map[string]*primitive.ObjectID
-	variations      *map[string]*primitive.ObjectID
+	AttributeGroups *map[string]*primitive.ObjectID
+	Attributes      *map[string]*primitive.ObjectID
+	Variations      *map[string]*primitive.ObjectID
 }
 
 type Props_FindAllByProductIdWithDataPopulation struct {
