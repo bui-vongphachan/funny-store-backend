@@ -103,13 +103,14 @@ func FindByProductIdWithOriginalPopulation(props *Props_FindAllByProductIdWithDa
 
 func Replicate(props *Props_Replicate) (*[]ProductVariationAttribute, error) {
 
-	newList := []ProductVariationAttribute{}
+	newList := make([]ProductVariationAttribute, 0)
 	for _, item := range *props.SourceList {
+
 		newItem := ProductVariationAttribute{
 			ID:               primitive.NewObjectID(),
-			AttributeGroupId: item.AttributeGroup.ID,
-			VariationId:      item.Variation.ID,
-			AttributeId:      item.Attribute.ID,
+			AttributeGroupId: *(*props.attributeGroups)[item.AttributeGroupId.String()],
+			VariationId:      *(*props.variations)[item.VariationId.String()],
+			AttributeId:      *(*props.attributes)[item.AttributeId.String()],
 			OriginalId:       item.ID,
 		}
 
@@ -119,7 +120,7 @@ func Replicate(props *Props_Replicate) (*[]ProductVariationAttribute, error) {
 	return &newList, nil
 }
 
-func RelicateAndSave(props *Props_Replicate) (*[]ProductVariationAttribute, error) {
+func RelicateAndSave(props *Props_Replicate, sessionContext mongo.SessionContext) (*[]ProductVariationAttribute, error) {
 	replicatedItems, err := Replicate(props)
 	if err != nil {
 		log.Println(err.Error())
@@ -132,7 +133,7 @@ func RelicateAndSave(props *Props_Replicate) (*[]ProductVariationAttribute, erro
 		items = append(items, item)
 	}
 
-	result, err := props.DB.Collection(CollectionName).InsertMany(*props.SessionContext, items)
+	result, err := props.DB.Collection(CollectionName).InsertMany(sessionContext, items)
 	if err != nil {
 		log.Println(err.Error())
 		return nil, err
