@@ -99,19 +99,8 @@ func FindAllByProductIdWithDataPopulation(props *Props_FindAllByProductIdWithDat
 
 func Replicate(props *Props_Replicate) (*[]ProductVariationAttribute, error) {
 
-	items, err := FindAllByProductIdWithDataPopulation(&Props_FindAllByProductIdWithDataPopulation{
-		DB:             props.DB,
-		ProductID:      props.ProductId,
-		SessionContext: props.SessionContext,
-	})
-	if err != nil {
-		log.Println(err.Error())
-		return nil, err
-	}
-
-	// Convert items to ProductVariationAttribute with new ObjectID and its ancestor's ObjectID
 	newList := []ProductVariationAttribute{}
-	for _, item := range *items {
+	for _, item := range *props.SourceList {
 		newItem := ProductVariationAttribute{
 			ID:               primitive.NewObjectID(),
 			AttributeGroupId: item.AttributeGroup.ID,
