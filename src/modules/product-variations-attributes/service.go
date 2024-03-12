@@ -97,6 +97,10 @@ func FindAllByProductIdWithDataPopulation(props *Props_FindAllByProductIdWithDat
 	return &result, nil
 }
 
+func FindByProductIdWithOriginalPopulation(props *Props_FindAllByProductIdWithDataPopulation) {
+
+}
+
 func Replicate(props *Props_Replicate) (*[]ProductVariationAttribute, error) {
 
 	newList := []ProductVariationAttribute{}
