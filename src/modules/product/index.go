@@ -8,6 +8,7 @@ import (
 	product_attribute_group "github.com/vongphachan/funny-store-backend/src/modules/product-attribute-group"
 	product_attribute "github.com/vongphachan/funny-store-backend/src/modules/product-attributes"
 	product_variations "github.com/vongphachan/funny-store-backend/src/modules/product-variations"
+	product_variations_attributes "github.com/vongphachan/funny-store-backend/src/modules/product-variations-attributes"
 	"github.com/vongphachan/funny-store-backend/src/modules/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -125,6 +126,55 @@ func API_Replicate(db *mongo.Database, r *gin.Engine) {
 			if err != nil {
 				session.AbortTransaction(sessionCtx)
 				return err
+			}
+
+			{
+				_, err := product_attribute_group.FindAllByProductId(db, &requestBody.SourceProductID, &sessionCtx)
+				if err != nil {
+					session.AbortTransaction(sessionCtx)
+					return err
+				}
+			}
+
+			{
+				_, err := product_attribute.FindAllByProductId(db, &requestBody.SourceProductID, &sessionCtx)
+				if err != nil {
+					session.AbortTransaction(sessionCtx)
+					return err
+				}
+			}
+
+			{
+				_, err := product_variations.FindAllByProductId(db, &requestBody.SourceProductID)
+				if err != nil {
+					session.AbortTransaction(sessionCtx)
+					return err
+				}
+			}
+
+			{
+				_, err := product_variations_attributes.FindAllByProductIdWithDataPopulation(&product_variations_attributes.Props_FindAllByProductIdWithDataPopulation{
+					DB:             db,
+					ProductID:      sourceProductId,
+					SessionContext: &sessionCtx,
+				})
+				if err != nil {
+					session.AbortTransaction(sessionCtx)
+					return err
+				}
+			}
+
+			{
+				_, err := product_variations_attributes.RelicateAndSave(&product_variations_attributes.Props_Replicate{
+					DB:              db,
+					TargetProductID: targetProductId,
+					ProductId:       sourceProductId,
+					SessionContext:  &sessionCtx,
+				})
+				if err != nil {
+					session.AbortTransaction(sessionCtx)
+					return err
+				}
 			}
 
 			result["data"] = product
