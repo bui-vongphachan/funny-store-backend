@@ -7,5 +7,7 @@ import (
 func main() {
 	db := initiators.StartMongoDB()
 
+	initiators.StartRedis()
+
 	initiators.StartGin(db)
 }
