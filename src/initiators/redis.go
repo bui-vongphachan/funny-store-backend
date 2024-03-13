@@ -8,7 +8,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func NewRedis(chanel int) *redis.Client {
+func StartRedis() *redis.Client {
 
 	log.Println("Starting Redis...")
 
@@ -24,6 +24,8 @@ func NewRedis(chanel int) *redis.Client {
 	}
 
 	client := redis.NewClient(opt)
+
+	log.Println("Redis is connected")
 
 	return client
 }
