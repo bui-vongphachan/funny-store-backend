@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/vongphachan/funny-store-backend/src/modules/authentication"
-	gin_pipeline "github.com/vongphachan/funny-store-backend/src/modules/gin-pipeline"
+	log_file "github.com/vongphachan/funny-store-backend/src/modules/log-file"
 	"github.com/vongphachan/funny-store-backend/src/modules/product"
 	product_attribute_group "github.com/vongphachan/funny-store-backend/src/modules/product-attribute-group"
 	product_attribute "github.com/vongphachan/funny-store-backend/src/modules/product-attributes"
@@ -48,11 +48,10 @@ func setupRoutes(db *mongo.Database) *gin.Engine {
 
 	router.SetTrustedProxies([]string{CURRENT_PROXY})
 
-	router.POST("/login", func(c *gin.Context) { authentication.API_Login(db, c) })
+	authorized := router.Group("/")
+	authorized.Use(log_file.Logging)
 
-	g := router.Group("/api")
-
-	g.Use(gin_pipeline.Test)
+	authorized.POST("/login", func(c *gin.Context) { authentication.Route_Login(db, c) })
 
 	product.API_CreateDraft(db, router)
 	product.API_Replicate(db, router)
