@@ -1,50 +1,54 @@
 package authentication
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vongphachan/funny-store-backend/src/modules/admins"
+	log_file "github.com/vongphachan/funny-store-backend/src/modules/log-file"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func API_Login(db *mongo.Database, c *gin.Context) {
+func Route_Login(db *mongo.Database, c *gin.Context) {
 	result := gin.H{
 		"data":    nil,
 		"message": "Invalid data",
 	}
 
-	log.Println("API_Login")
 	var body struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
-	c.BindJSON(&body)
+	err := c.Bind(&body)
+	if err != nil {
+		log_file.LogErrorAndResponse(c, &err, &result, http.StatusBadRequest)
+		return
+	}
 
 	admin, err := admins.FindOneByEmail(db, &body.Email)
 	if err != nil {
-		result["message"] = err.Error()
-		c.JSON(http.StatusBadRequest, result)
+		result["message"] = "Invalid email or password"
+		log_file.LogErrorAndResponse(c, &err, &result, http.StatusBadRequest)
 		return
 	}
 
 	isMatched, err := ComparePassword(&admin.Password, &body.Password)
 	if err != nil {
-		result["message"] = err.Error()
-		c.JSON(http.StatusBadRequest, result)
+		result["message"] = "Invalid email or password"
+		log_file.LogErrorAndResponse(c, &err, &result, http.StatusBadRequest)
 		return
 	}
 
 	if !isMatched {
 		result["message"] = "Invalid email or password"
-		c.JSON(http.StatusBadRequest, result)
+		log_file.LogErrorAndResponse(c, &err, &result, http.StatusBadRequest)
 		return
 	}
 
 	result["data"] = nil
 	result["message"] = "Success"
 
+	log_file.SaveResponseLog(c, &result)
 	c.JSON(http.StatusOK, result)
 }
