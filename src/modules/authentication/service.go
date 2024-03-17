@@ -11,7 +11,33 @@ import (
 )
 
 func ValidateToken(c *gin.Context) {
+	tokenString := c.GetHeader("Authorization")
 
+	if tokenString == "" {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		c.Abort()
+		return
+	}
+
+	claims := jwt.MapClaims{}
+
+	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(KEY_Secret), nil
+	})
+
+	if err != nil {
+		log_file.SaveErrorLog(c, &err)
+		c.JSON(401, gin.H{
+			"data":    nil,
+			"message": "Unauthorized",
+		})
+		c.Abort()
+		return
+	}
+
+	c.Next()
 }
 
 func GenerateToken(c *gin.Context, admin *admins.Admin) *string {
