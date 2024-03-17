@@ -46,7 +46,22 @@ func Route_Login(db *mongo.Database, c *gin.Context) {
 		return
 	}
 
-	result["data"] = nil
+	// delete the password from the admin object
+	admin.Password = ""
+
+	token := GenerateToken(c, admin)
+	if token == nil {
+		log_file.SaveResponseLog(c, &result)
+		c.JSON(http.StatusInternalServerError, result)
+		return
+	}
+
+	loginResponse := LoginResponse{
+		User:  admin,
+		Token: token,
+	}
+
+	result["data"] = loginResponse
 	result["message"] = "Success"
 
 	log_file.SaveResponseLog(c, &result)
