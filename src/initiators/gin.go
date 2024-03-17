@@ -48,12 +48,16 @@ func setupRoutes(db *mongo.Database) *gin.Engine {
 
 	router.SetTrustedProxies([]string{CURRENT_PROXY})
 
+	router.Use(log_file.Logging)
+
+	router.POST("/login", func(c *gin.Context) { authentication.Route_Login(db, c) })
+
 	authorized := router.Group("/")
-	authorized.Use(log_file.Logging)
 
-	authorized.POST("/login", func(c *gin.Context) { authentication.Route_Login(db, c) })
+	authorized.Use(authentication.ValidateToken)
 
-	product.API_CreateDraft(db, router)
+	authorized.POST("/product", func(c *gin.Context) { product.Route_CreateDraft(db, c) })
+
 	product.API_Replicate(db, router)
 
 	product_attribute.API_Create(db, router)

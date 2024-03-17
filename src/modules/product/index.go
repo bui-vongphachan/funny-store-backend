@@ -15,58 +15,57 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func API_CreateDraft(db *mongo.Database, r *gin.Engine) {
-	r.POST("/product/draft", func(c *gin.Context) {
-		result := gin.H{
-			"status":  http.StatusBadRequest,
-			"isError": true,
-			"data":    nil,
-			"message": "Invalid data",
-		}
+func Route_CreateDraft(db *mongo.Database, c *gin.Context) {
 
-		product := CreateEmpty()
+	result := gin.H{
+		"status":  http.StatusBadRequest,
+		"isError": true,
+		"data":    nil,
+		"message": "Invalid data",
+	}
 
-		attributeGroup, err := product_attribute_group.CreateEmpty(&product.ID)
-		if err != nil {
-			result["message"] = err.Error()
-			c.JSON(http.StatusOK, result)
-			return
-		}
+	product := CreateEmpty()
 
-		attribute, err := product_attribute.CreateEmpty(&product.ID, &attributeGroup.ID)
-		if err != nil {
-			result["message"] = err.Error()
-			c.JSON(http.StatusOK, result)
-			return
-		}
-
-		productVariations, err := product_variations.CreateEmpty(&product.ID)
-		if err != nil {
-			result["message"] = err.Error()
-			c.JSON(http.StatusOK, result)
-			return
-		}
-
-		saveResult, err := Save(db, product)
-		if err != nil || saveResult == nil {
-			result["message"] = err.Error()
-			c.JSON(http.StatusOK, result)
-			return
-		}
-
-		product_attribute_group.Save(db, attributeGroup)
-
-		product_attribute.Save(db, attribute)
-
-		product_variations.Save(db, productVariations)
-
-		result["data"] = product
-		result["status"] = http.StatusCreated
-		result["isError"] = false
-		result["message"] = "Success"
-
+	attributeGroup, err := product_attribute_group.CreateEmpty(&product.ID)
+	if err != nil {
+		result["message"] = err.Error()
 		c.JSON(http.StatusOK, result)
-	})
+		return
+	}
+
+	attribute, err := product_attribute.CreateEmpty(&product.ID, &attributeGroup.ID)
+	if err != nil {
+		result["message"] = err.Error()
+		c.JSON(http.StatusOK, result)
+		return
+	}
+
+	productVariations, err := product_variations.CreateEmpty(&product.ID)
+	if err != nil {
+		result["message"] = err.Error()
+		c.JSON(http.StatusOK, result)
+		return
+	}
+
+	saveResult, err := Save(db, product)
+	if err != nil || saveResult == nil {
+		result["message"] = err.Error()
+		c.JSON(http.StatusOK, result)
+		return
+	}
+
+	product_attribute_group.Save(db, attributeGroup)
+
+	product_attribute.Save(db, attribute)
+
+	product_variations.Save(db, productVariations)
+
+	result["data"] = product
+	result["status"] = http.StatusCreated
+	result["isError"] = false
+	result["message"] = "Success"
+
+	c.JSON(http.StatusOK, result)
 
 }
 
