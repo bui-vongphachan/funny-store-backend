@@ -21,6 +21,9 @@ func ValidateToken(c *gin.Context) {
 		return
 	}
 
+	// remove the "Bearer " prefix
+	tokenString = tokenString[7:]
+
 	claims := jwt.MapClaims{}
 
 	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
